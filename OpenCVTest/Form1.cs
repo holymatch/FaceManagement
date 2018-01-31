@@ -24,7 +24,6 @@ namespace OpenCVTest
     {
 
         private VideoCapture _capture = null; //Camera
-        private DataStoreAccess _dataStoreAccess = null;
 
         private static String _databasePath = Application.StartupPath + "\\Database\\facedb.db";
         private static String _trainerPath = Application.StartupPath + "\\..\\..\\TrainingImage";
@@ -38,7 +37,6 @@ namespace OpenCVTest
         public Form1()
         {
             InitializeComponent();
-            _dataStoreAccess = new DataStoreAccess(_databasePath);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -186,20 +184,16 @@ namespace OpenCVTest
         private void button2_Click(object sender, EventArgs e)
         {
             FaceRecognizer recognizer = new FaceRecognizer();
-            MessageBox.Show(recognizer.TrainRecognizer().ToString(), "Training result", MessageBoxButtons.OK);
-
+           
         }
 
         private void saveFace(Bitmap face)
         {
-            IDataStoreAccess dataStore = new DataStoreAccess(_databasePath);
-
+            
             if (txtUsrename.Text.Trim() != String.Empty)
             {
                 var username = txtUsrename.Text.Trim().Trim().ToLower();
-                var result = dataStore.SaveFace(username, ImageToByte(face));
                 //MessageBox.Show(result, "Save Result", MessageBoxButtons.OK);
-                Debug.Print("Result : " + result);
             }
         }
 
@@ -223,7 +217,7 @@ namespace OpenCVTest
             var resultMsg = "Face not recongize";
             if (result != -1)
             {
-                resultMsg = _dataStoreAccess.GetUsername(Convert.ToInt32(result));
+                
             }
             MessageBox.Show(resultMsg, "Result", MessageBoxButtons.OK);
 
@@ -253,7 +247,7 @@ namespace OpenCVTest
                     {
 
                         Image<Gray, Byte> faceImage = new Image<Gray, Byte>(humanFaces[0].face.ToBitmap()); 
-                        _dataStoreAccess.SaveFace(d.Name, (ImageToByte(faceImage.ToBitmap())));
+                        
                     }
                     /*
                     Byte[] file;
