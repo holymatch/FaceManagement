@@ -51,13 +51,14 @@ namespace OpenCVTest
 
         public Image<Bgr, byte> cropFaceInRectangle(Image<Bgr, byte> bgrImage, Rectangle face)
         {
-            Bitmap tragetFace = new Bitmap(face.Width, face.Height);
-            using (Graphics g = Graphics.FromImage(tragetFace))
+            using (Bitmap tragetFace = new Bitmap(face.Width, face.Height))
             {
-                g.DrawImage(bgrImage.Bitmap, new Rectangle(0, 0, tragetFace.Width, tragetFace.Height), face, GraphicsUnit.Pixel);
-            }
-
-            return new Image<Bgr, byte>(tragetFace);
+                using (Graphics g = Graphics.FromImage(tragetFace))
+                {
+                    g.DrawImage(bgrImage.Bitmap, new Rectangle(0, 0, tragetFace.Width, tragetFace.Height), face, GraphicsUnit.Pixel);
+                }
+                return new Image<Bgr, byte>(tragetFace);
+            }            
         }
 
         public List<HumanFace> findHumanFace(Image image)
@@ -87,21 +88,25 @@ namespace OpenCVTest
             var faces = findFace(bgrImage);
             for (var i = 0; i < faces.Count(); i++)
             {
-                var faecImage = cropFaceInRectangle(bgrImage, faces[i]);
-                humanFaces.Add(new HumanFace(faecImage, faces[i]));
+                using (var faecImage = cropFaceInRectangle(bgrImage, faces[i]))
+                {
+                    humanFaces.Add(new HumanFace(faecImage.Clone(), faces[i]));
+                }                
             }
             return humanFaces;
         }
 
         public bool getImageWithFace(Image image)
         {
-            var bgrImage = new Image<Bgr, byte>(new Bitmap(image));
-            var result = getImageWithFace(bgrImage);
-            if (result)
+            using(var bgrImage = new Image<Bgr, byte>(new Bitmap(image)))
             {
-                image = bgrImage.Bitmap;
-            }            
-            return result;
+                var result = getImageWithFace(bgrImage);
+                if (result)
+                {
+                    image = bgrImage.Bitmap;
+                }
+                return result;
+            }
         }
 
         public bool getImageWithFace(Image<Bgr, byte> bgrImage)

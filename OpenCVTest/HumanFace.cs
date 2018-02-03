@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenCVTest
 {
-    class HumanFace
+    class HumanFace : IDisposable
     {
         public Image<Bgr, byte> face { get; set; }
         public Rectangle faceRectangle { get; set; }
@@ -27,6 +27,11 @@ namespace OpenCVTest
             this.face = face;
             this.faceRectangle = faceRectangle;
             this.eyeRectangle = new Rectangle[0];
+        }
+
+        public void Dispose()
+        {
+            face.Dispose();
         }
     }
 }

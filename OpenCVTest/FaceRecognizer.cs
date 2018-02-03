@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace OpenCVTest
 {
-    class FaceRecognizer
+    class FaceRecognizer : IDisposable
     {
 
         private static String _databasePath = Application.StartupPath + "\\Database\\facedb.db";
@@ -20,6 +20,11 @@ namespace OpenCVTest
         public FaceRecognizer() 
         {
             _faceRecognizer = new EigenFaceRecognizer(80, 3900);
+        }
+
+        public void Dispose()
+        {
+            _faceRecognizer.Dispose();
         }
 
         public void LoadRecognizerData()

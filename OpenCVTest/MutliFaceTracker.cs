@@ -37,6 +37,7 @@ namespace OpenCVTest
             {
                 if ((!trackNode.Value.trackFace(bgrImage) || trackNode.Value.FailToRecognize) && trackNode.Value.failFrameCount > REINITBYFAILFRAMECOUNT)
                 {
+                    trackNode.Value.Dispose();
                     trackingFaces.Remove(trackNode.Value);
                     Debug.Print("Face removed, total face: {0}", trackingFaces.Count());
                 }

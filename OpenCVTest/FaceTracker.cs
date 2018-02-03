@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace OpenCVTest
 {
-    class FaceTracker
+    class FaceTracker : IDisposable
     {
 
         private const string TRACKERTYPE = "MEDIANFLOW";
@@ -37,85 +37,90 @@ namespace OpenCVTest
 
         private FaceTracker()
         {
-            
+            tracker = new Tracker(TRACKERTYPE);
         }
 
         public bool trackFace(Image<Bgr, byte> bgrImage)
         {
             var result = false;
 
-            var grayframe = new Image<Gray, byte>(new Bitmap(bgrImage.Bitmap));
-            if (!isInit)
+            using (var grayframe = new Image<Gray, byte>(new Bitmap(bgrImage.Bitmap)))
             {
-                if (bgrImage != null)
+                if (!isInit)
                 {
-                    result = trackingInit(bgrImage);
-                }
-            }
-            else
-            {
-                if (bgrImage != null)
-                {
-                    try
+                    if (bgrImage != null)
                     {
-                        var updateFace = new Rectangle();
-                        result = tracker.Update(grayframe.Mat, out updateFace);
-                         if (!result)
+                        result = trackingInit(bgrImage);
+                    }
+                }
+                else
+                {
+                    if (bgrImage != null)
+                    {
+                        try
                         {
-                            failFrameCount++;
-                            findFace = false;                            
-                        }
-                        else
-                        {
-
-                            //var updateFace = new Rectangle();
-                            //var result = tracker.Update(grayframe.Mat, out updateFace);
-
-                            /*
-                             * for ( var i = 0; i < updateFace.ToArray().Count(); i ++)
-                            {
-                                bgrImage.Draw(updateFace.ToArray()[i], new Bgr(Color.Red), 3);
-                            }*/
-
-                            Color color = Color.Gray;
-                            if (Person != null)
-                            {
-                                color = Color.Green;
-                            } else if (FailToRecognize)
-                            {
-                                color = Color.Red;
-                            }
-
-                            bgrImage.Draw(updateFace, new Bgr(color), 3);
-                            //TODO update name
-                            if (Person != null)
-                            {
-                                Graphics g = Graphics.FromImage(bgrImage.Bitmap);
-
-                                int tWidth = (int)g.MeasureString(Person.name, new Font("Arial", 12, FontStyle.Bold)).Width;
-                                int x;
-                                if (tWidth >= updateFace.Width)
-                                    x = updateFace.Left - ((tWidth - updateFace.Width) / 2);
-                                else
-                                    x = (updateFace.Width / 2) - (tWidth / 2) + updateFace.Left;
-
-                                g.DrawString(Person.name, new Font("Arial", 12, FontStyle.Bold), Brushes.Green, new PointF(x, updateFace.Top - 18));
-                            }
-                            humanFace.faceRectangle = updateFace;
-                            findFace = true;
-                            //UpdatePersonAsync();
-                            if (FailToRecognize)
+                            var updateFace = new Rectangle();
+                            result = tracker.Update(grayframe.Mat, out updateFace);
+                            if (!result)
                             {
                                 failFrameCount++;
-                            } else
+                                findFace = false;
+                            }
+                            else
                             {
-                                failFrameCount = 0;
-                            }                            
+
+                                //var updateFace = new Rectangle();
+                                //var result = tracker.Update(grayframe.Mat, out updateFace);
+
+                                /*
+                                 * for ( var i = 0; i < updateFace.ToArray().Count(); i ++)
+                                {
+                                    bgrImage.Draw(updateFace.ToArray()[i], new Bgr(Color.Red), 3);
+                                }*/
+
+                                Color color = Color.Gray;
+                                if (Person != null)
+                                {
+                                    color = Color.Green;
+                                }
+                                else if (FailToRecognize)
+                                {
+                                    color = Color.Red;
+                                }
+
+                                bgrImage.Draw(updateFace, new Bgr(color), 3);
+                                //TODO update name
+                                if (Person != null)
+                                {
+                                    using (Graphics g = Graphics.FromImage(bgrImage.Bitmap))
+                                    {
+                                        int tWidth = (int)g.MeasureString(Person.name, new Font("Arial", 12, FontStyle.Bold)).Width;
+                                        int x;
+                                        if (tWidth >= updateFace.Width)
+                                            x = updateFace.Left - ((tWidth - updateFace.Width) / 2);
+                                        else
+                                            x = (updateFace.Width / 2) - (tWidth / 2) + updateFace.Left;
+
+                                        g.DrawString(Person.name, new Font("Arial", 12, FontStyle.Bold), Brushes.Green, new PointF(x, updateFace.Top - 18));
+                                    }                                    
+                                }
+                                humanFace.faceRectangle = updateFace;
+                                findFace = true;
+                                //UpdatePersonAsync();
+                                if (FailToRecognize)
+                                {
+                                    failFrameCount++;
+                                }
+                                else
+                                {
+                                    failFrameCount = 0;
+                                }
+                            }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.Print(ex.ToString());
+                        catch (Exception ex)
+                        {
+                            Debug.Print(ex.ToString());
+                        }
                     }
                 }
             }
@@ -124,20 +129,22 @@ namespace OpenCVTest
 
         private bool trackingInit(Image<Bgr, byte> bgrImage)
         {
-            var grayframe = new Image<Gray, byte>(new Bitmap(bgrImage.Bitmap));
-            var faceDetector = new FaceDetector();
-
-            isInit = tracker.Init(grayframe.Mat, humanFace.faceRectangle);
-            //Debug.Print("Tracking Init {0}", isInit);
-            if (isInit && !findFace)
+            using (var grayframe = new Image<Gray, byte>(new Bitmap(bgrImage.Bitmap)))
             {
-                bgrImage = faceDetector.drawFaceToImage(bgrImage, humanFace);
-                findFace = true;
-                UpdatePersonAsync();
-                failFrameCount = 0;
+                var faceDetector = new FaceDetector();
+
+                isInit = tracker.Init(grayframe.Mat, humanFace.faceRectangle);
+                //Debug.Print("Tracking Init {0}", isInit);
+                if (isInit && !findFace)
+                {
+                    bgrImage = faceDetector.drawFaceToImage(bgrImage, humanFace);
+                    findFace = true;
+                    UpdatePersonAsync();
+                    failFrameCount = 0;
+                }
+
+                return isInit;
             }            
-            
-            return isInit;
         }
 
         private async void UpdatePersonAsync()
@@ -166,6 +173,11 @@ namespace OpenCVTest
                 timer.Stop();
                 TimeSpan timespan = timer.Elapsed;
             }
+        }
+
+        public void Dispose()
+        {
+            tracker.Dispose();
         }
     }
 }
