@@ -8,18 +8,18 @@ namespace RestfulClient
 {
     class Person
     {
-        //public int? id { get; set; }
+        public long? id { get; set; }
         public string name { get; set; }
         public string detail { get; set; }
         public float? score { get; set; }
-        public string facedata { get; set; }
+        public string faceData { get; set; }
 
-        public Person(string name, string detail, string facedata)
+        public Person(string name, string detail, string faceData)
         {
             //this.id = null;
             this.name = name;
             this.detail = detail;
-            this.facedata = facedata;
+            this.faceData = faceData;
             this.score = null;
         }
     }
