@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace OpenCVTest
 {
-    class MutliFaceTracker
+    class MutliFaceTracker : IDisposable
     {
         private const int REINITBYSUCCESSFRAMECOUNT = 48;
         private const int REINITBYFAILFRAMECOUNT = 6;
@@ -104,6 +104,14 @@ namespace OpenCVTest
                 Debug.Print("New face added, total face: {0}", trackingFaces.Count());
             }
             return result;
+        }
+
+        public void Dispose()
+        {
+            foreach(FaceTracker ft in trackingFaces )
+            {
+                ft.Dispose();
+            }
         }
     }
 }

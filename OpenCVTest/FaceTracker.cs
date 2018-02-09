@@ -94,14 +94,14 @@ namespace OpenCVTest
                                 {
                                     using (Graphics g = Graphics.FromImage(bgrImage.Bitmap))
                                     {
-                                        int tWidth = (int)g.MeasureString(Person.name, new Font("Arial", 12, FontStyle.Bold)).Width;
+                                        int tWidth = (int)g.MeasureString(Person.Name, new Font("Arial", 12, FontStyle.Bold)).Width;
                                         int x;
                                         if (tWidth >= updateFace.Width)
                                             x = updateFace.Left - ((tWidth - updateFace.Width) / 2);
                                         else
                                             x = (updateFace.Width / 2) - (tWidth / 2) + updateFace.Left;
 
-                                        g.DrawString(Person.name, new Font("Arial", 12, FontStyle.Bold), Brushes.Green, new PointF(x, updateFace.Top - 18));
+                                        g.DrawString(Person.Name, new Font("Arial", 12, FontStyle.Bold), Brushes.Green, new PointF(x, updateFace.Top - 18));
                                     }                                    
                                 }
                                 humanFace.faceRectangle = updateFace;

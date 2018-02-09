@@ -30,20 +30,32 @@ namespace OpenCVTest
 
         private static int RESIZE_IMAGE_HEIGHT = 75, RESIZE_IMAGE_WIIDTH = 75;
 
-        private List<Person> people;
+        private Dictionary<String, Person> people = new Dictionary<string, Person>();
         private CaptureImageType captureImageType;
 
         enum CaptureImageType
         {
             None,
             NewPerson,
+            NewPersonCaptured,
             CurrentPerson,
-            UpdatePerson
+            UpdatePerson,
+            UpdatePersonCaptured
         }
 
-        MutliFaceTracker tracker;
+        enum FlowAction
+        {
+            StartPreview,
+            CaptureFace,
+            SelectFace,
+            Cancel,
+            Save,
+            List
+        }
 
-        byte[] cropedFace;
+        private MutliFaceTracker tracker;
+
+        private byte[] cropedFace;
         
         public Form1()
         {
@@ -59,7 +71,22 @@ namespace OpenCVTest
                 //Rectanle cropRect = tracker.TrackingFaces.First.Value.humanFace.faceRectangle;
                 imageBoxCapturedImage.Image = tracker.TrackingFaces.First.Value.humanFace.face;
                 //cropedFace = tracker.TrackingFaces.First.Value.humanFace.face.ToJpegData();
-                cropedFace = tracker.TrackingFaces.First.Value.humanFace.face.Resize(RESIZE_IMAGE_WIIDTH, RESIZE_IMAGE_HEIGHT, Emgu.CV.CvEnum.Inter.Cubic).ToJpegData();
+
+                var imageList = new ImageList();
+                imageList.ImageSize = new Size(72, 72);
+                imageList.ColorDepth = ColorDepth.Depth32Bit;
+                lvFaceList.Clear();
+                int i = 0;
+                lvFaceList.LargeImageList = imageList;
+                foreach (FaceTracker tracker in tracker.TrackingFaces)
+                {
+                    imageList.Images.Add(i.ToString(), tracker.humanFace.face.Bitmap);
+                    lvFaceList.Items.Add(i.ToString(), i.ToString());
+                    i++;
+                }
+                UpdateFlow(FlowAction.CaptureFace);
+                //cropedFace = tracker.TrackingFaces.First.Value.humanFace.face.Resize(RESIZE_IMAGE_WIIDTH, RESIZE_IMAGE_HEIGHT, Emgu.CV.CvEnum.Inter.Cubic).ToJpegData();
+
             }
             
             //imageBoxCapturedImage.Image = _capture.QueryFrame();
@@ -288,7 +315,7 @@ namespace OpenCVTest
         {
             _capture = new VideoCapture();
             imgCamUser.Image = _capture.QueryFrame();
-            UpdateBtnStatus(CaptureImageType.NewPerson);
+            UpdateFlow(FlowAction.StartPreview);
             Application.Idle += Tracking;
         }
 
@@ -311,6 +338,7 @@ namespace OpenCVTest
         private async void btnCheckFace_ClickAsync(object sender, EventArgs e)
         {
             txtUsrename.Text = "";
+            txtDetail.Text = "";
             txtScore.Text = "";
             Stopwatch timer = Stopwatch.StartNew();
             var face_data = new WebEntity.Face(Convert.ToBase64String(cropedFace));
@@ -319,9 +347,10 @@ namespace OpenCVTest
                 var response = await RestfulClient.Recognize(face_data);
                 if (response.ReturnCode == 200)
                 {
-                    txtUsrename.Text = response.Content.name;
-                    txtScore.Text = response.Content.score.ToString();
-                    txtErrorMessage.Text = "";
+                    txtUsrename.Text = response.Content.Name;
+                    txtScore.Text = response.Content.Face.Score.ToString();
+                    txtDetail.Text = response.Content.Detail;
+                    txtErrorMessage.Text = response.Message;
                 }
                 else
                 {
@@ -348,16 +377,20 @@ namespace OpenCVTest
                 var response = await RestfulClient.ListPeople();
                 if (response.ReturnCode == 200)
                 {
-                    people = response.Content;
+                    var l_people = response.Content;
                     var imageList = new ImageList();
                     imageList.ImageSize = new Size(72, 72);
                     imageList.ColorDepth = ColorDepth.Depth32Bit;
                     lvFaceList.Clear();
-                    foreach (Person person in people )
+                    foreach (Person person in l_people )
                     {
-                        imageList.Images.Add(person.id.ToString(), Base64ToImage(person.faceData));
-                        lvFaceList.LargeImageList = imageList;
-                        lvFaceList.Items.Add(person.name, person.id.ToString());
+                        if (person.Face != null && person.Face.FaceData != null)
+                        {
+                            people.Add(person.Face.Identify.ToString(), person);
+                            imageList.Images.Add(person.Face.Identify.ToString(), Base64ToImage(person.Face.FaceData));
+                            lvFaceList.LargeImageList = imageList;
+                            lvFaceList.Items.Add(person.Name, person.Face.Identify.ToString());
+                        }
                     }
                     lvFaceList.LargeImageList = imageList;
                     txtErrorMessage.Text = "Success";
@@ -370,7 +403,9 @@ namespace OpenCVTest
             }
             catch (Exception ex)
             {
+                
                 Debug.WriteLine("Error on connecting server: " + ex.Message);
+                Debug.WriteLine(ex.StackTrace);
                 txtErrorMessage.Text = "Error on connecting server: " + ex.Message;
             }
         }
@@ -379,7 +414,7 @@ namespace OpenCVTest
         {
             if (cropedFace != null)
             {
-                var person = new Person(txtUsrename.Text, txtDetail.Text, Convert.ToBase64String(cropedFace));
+                var person = new Person(txtUsrename.Text, txtDetail.Text, new WebEntity.Face(Convert.ToBase64String(cropedFace)));
 
                 try
                 {
@@ -404,40 +439,202 @@ namespace OpenCVTest
             {
                 MessageBox.Show("Please capture face first.","No face found",MessageBoxButtons.OK,MessageBoxIcon.Error);
             }
+
+            UpdateFlow(FlowAction.Save);
         }
 
         private void lvFaceList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lvFaceList.SelectedItems.Count > 0)
+            switch (captureImageType)
             {
-                var imageIndex = lvFaceList.LargeImageList.Images.IndexOfKey(lvFaceList.SelectedItems[0].ImageKey);
-                if (imageIndex > -1 && imageIndex < lvFaceList.LargeImageList.Images.Count)
-                {
-                    if (people[imageIndex].id.ToString() == lvFaceList.SelectedItems[0].ImageKey)
+                case CaptureImageType.NewPersonCaptured:
+                    if (lvFaceList.SelectedItems.Count > 0)
                     {
-                        txtUsrename.Text = people[imageIndex].name;
-                        txtDetail.Text = people[imageIndex].detail;
+                        var imageIndex = lvFaceList.LargeImageList.Images.IndexOfKey(lvFaceList.SelectedItems[0].ImageKey);
+                        if (imageIndex > -1 && imageIndex < lvFaceList.LargeImageList.Images.Count)
+                        {
+                            using (Bitmap bmpImage = new Bitmap(lvFaceList.LargeImageList.Images[imageIndex]))
+                            {
+                                imageBoxCapturedImage.Image = new Image<Bgr, Byte>(bmpImage);
+                                cropedFace = tracker.TrackingFaces.ElementAt(imageIndex).humanFace.face.Resize(RESIZE_IMAGE_WIIDTH, RESIZE_IMAGE_HEIGHT, Emgu.CV.CvEnum.Inter.Cubic).ToJpegData();
+                            }
+                        }
+                    } else
+                    {
+                        if (imageBoxCapturedImage.Image != null)
+                        {
+                            imageBoxCapturedImage.Image.Dispose();
+                            imageBoxCapturedImage.Image = null;
+                            cropedFace = null;
+                        }
                     }
-                    Bitmap bmpImage = new Bitmap(lvFaceList.LargeImageList.Images[imageIndex]);
-                    imageBoxCapturedImage.Image = new Image<Bgr, Byte>(bmpImage);
-                    captureImageType = CaptureImageType.CurrentPerson;
-                    bmpImage.Dispose();
-                }
-                UpdateBtnStatus(CaptureImageType.CurrentPerson);
-            } else
-            {
-                if (imageBoxCapturedImage.Image != null)
-                {
-                    imageBoxCapturedImage.Image.Dispose();
-                    imageBoxCapturedImage.Image = null;
-                }
-                UpdateBtnStatus(CaptureImageType.None);
-            }                  
+                    break;
+                case CaptureImageType.None:
+                case CaptureImageType.CurrentPerson:
+                    if (lvFaceList.SelectedItems.Count > 0)
+                    {
+
+                        var person = people[lvFaceList.SelectedItems[0].ImageKey];
+                        txtUsrename.Text = person.Name;
+                        txtDetail.Text = person.Detail;
+                        using (var image = new Bitmap(Base64ToImage(person.Face.FaceData)))
+                        {
+                            imageBoxCapturedImage.Image = new Image<Bgr, Byte>(image);
+                        }                        
+                        /*
+                        var imageIndex = lvFaceList.LargeImageList.Images.IndexOfKey(lvFaceList.SelectedItems[0].ImageKey);
+                        if (imageIndex > -1 && imageIndex < lvFaceList.LargeImageList.Images.Count)
+                        {
+                            if (people[imageIndex].Face.Identify.ToString() == lvFaceList.SelectedItems[0].ImageKey)
+                            {
+                                txtUsrename.Text = people[imageIndex].Name;
+                                txtDetail.Text = people[imageIndex].Detail;
+                            }
+                            using (Bitmap bmpImage = new Bitmap(lvFaceList.LargeImageList.Images[imageIndex]))
+                            {
+                                imageBoxCapturedImage.Image = new Image<Bgr, Byte>(bmpImage);
+                            }
+                        }*/
+                    } else
+                    {
+                        txtDetail.Text = "";
+                        txtUsrename.Text = "";
+                        txtScore.Text = "";
+                        if (imageBoxCapturedImage.Image != null)
+                        {
+                            imageBoxCapturedImage.Image.Dispose();
+                            imageBoxCapturedImage.Image = null;
+                            cropedFace = null;
+                        }
+                    }
+                    break;
+                case CaptureImageType.UpdatePerson:                        
+                    break;
+                case CaptureImageType.UpdatePersonCaptured:
+                    break;
+            }
+           
+            UpdateFlow(FlowAction.SelectFace);
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            UpdateBtnStatus(CaptureImageType.None);
+            UpdateFlow(FlowAction.Cancel);
+        }
+
+        private void UpdateFlow(FlowAction action)
+        {
+            switch (captureImageType)
+            {
+                case CaptureImageType.None:
+                    switch (action)
+                    {
+                        case FlowAction.StartPreview:
+                            UpdateBtnStatus(CaptureImageType.NewPerson);
+                            break;
+                        case FlowAction.SelectFace:
+                            UpdateBtnStatus(CaptureImageType.CurrentPerson);
+                            break;
+                        case FlowAction.List:
+                            break;
+                    }
+                    break;
+                case CaptureImageType.NewPerson:
+                    switch (action)
+                    {
+                        case FlowAction.SelectFace:
+                        case FlowAction.CaptureFace:
+                            UpdateBtnStatus(CaptureImageType.NewPersonCaptured);
+                            break;
+                        case FlowAction.Cancel:
+                            UpdateBtnStatus(CaptureImageType.None);
+                            break;
+                    }
+                    break;
+                case CaptureImageType.NewPersonCaptured:
+                    switch (action)
+                    {
+                        case FlowAction.SelectFace:
+                            UpdateSaveBtn();
+                            UpdateCheckImageBtn();
+                            break;
+                        case FlowAction.Cancel:
+                            UpdateBtnStatus(CaptureImageType.None);
+                            break;
+                        case FlowAction.Save:
+                            break;
+                    }
+                    break;
+                case CaptureImageType.CurrentPerson:
+                    switch (action)
+                    {
+                        case FlowAction.StartPreview:
+                            UpdateBtnStatus(CaptureImageType.UpdatePerson);
+                            break;
+                        case FlowAction.SelectFace:
+                            UpdateSaveBtn();
+                            UpdateCheckImageBtn();
+                            break;
+                        case FlowAction.Cancel:
+                            UpdateBtnStatus(CaptureImageType.None);
+                            break;
+                        case FlowAction.Save:
+                            break;
+                    }
+                    break;
+                case CaptureImageType.UpdatePerson:
+                    switch (action)
+                    {
+                        case FlowAction.CaptureFace:
+                        case FlowAction.SelectFace:
+                            UpdateBtnStatus(CaptureImageType.UpdatePersonCaptured);
+                            break;
+                        case FlowAction.Cancel:
+                            UpdateBtnStatus(CaptureImageType.None);
+                            break;
+                        case FlowAction.Save:
+                            break;
+                    }
+                    break;
+                case CaptureImageType.UpdatePersonCaptured:
+                    switch (action)
+                    {
+                        case FlowAction.CaptureFace:
+                        case FlowAction.SelectFace:
+                            UpdateCheckImageBtn();
+                            UpdateSaveBtn();
+                            break;
+                        case FlowAction.Cancel:
+                            UpdateBtnStatus(CaptureImageType.None);
+                            break;
+                        case FlowAction.Save:
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        private void UpdateCheckImageBtn()
+        {
+            if (cropedFace != null)
+            {
+                btnCheckFace.Enabled = true;
+            } else
+            {
+                btnCheckFace.Enabled = false;
+            }
+        }
+
+        private void UpdateSaveBtn()
+        {
+            if (cropedFace != null || (captureImageType == CaptureImageType.CurrentPerson && lvFaceList.SelectedItems.Count>0))
+            {
+                btnSaveFace.Enabled = true;
+            }
+            else
+            {
+                btnSaveFace.Enabled = false;
+            }
         }
 
         private void UpdateBtnStatus(CaptureImageType newStatus)
@@ -450,7 +647,7 @@ namespace OpenCVTest
                     txtDetail.Text = "";
                     txtScore.Text = "";
                     txtUsrename.Text = "";
-                    lvFaceList.SelectedItems.Clear();
+                    lvFaceList.Clear();
                     lvFaceList.Enabled = true;
                     imageBoxCapturedImage.Image = null;
                     btnCancel.Enabled = false;
@@ -460,14 +657,23 @@ namespace OpenCVTest
                     btnCheckFace.Enabled = false;
                     btnListPeople.Enabled = true;
                     btnCaptureFace.Enabled = false;
+                    if (tracker != null)
+                    {
+                        tracker.Dispose();
+                        tracker.TrackingFaces.Clear();
+                    }
+                    if (people != null)
+                    {
+                        people.Clear();
+                    }
                     break;
                 case CaptureImageType.NewPerson:
-                    lvFaceList.SelectedItems.Clear();
+                    lvFaceList.Clear();
                     lvFaceList.Enabled = false;
                     btnCancel.Enabled = true;
                     btnStartPreview.Enabled = false;
-                    btnSaveFace.Enabled = true;
-                    btnCheckFace.Enabled = true;
+                    btnSaveFace.Enabled = false;
+                    btnCheckFace.Enabled = false;
                     btnListPeople.Enabled = false;
                     btnCaptureFace.Enabled = true;
                     break;
@@ -475,14 +681,45 @@ namespace OpenCVTest
                     btnCancel.Enabled = true;
                     btnStartPreview.Enabled = true;
                     btnStartPreview.Text = "Start Preview";
-                    btnSaveFace.Enabled = true;
+                    UpdateSaveBtn();
                     btnCheckFace.Enabled = false;
                     btnListPeople.Enabled = false;
                     btnCaptureFace.Enabled = false;
                     break;
                 case CaptureImageType.UpdatePerson:
+                    lvFaceList.Clear();
+                    lvFaceList.Enabled = false;
+                    btnCancel.Enabled = true;
+                    btnStartPreview.Enabled = false;
+                    btnSaveFace.Enabled = false;
+                    btnCheckFace.Enabled = false;
+                    btnListPeople.Enabled = false;
+                    btnCaptureFace.Enabled = true;
+                    break;
+                case CaptureImageType.NewPersonCaptured:
+                    lvFaceList.Enabled = true;
+                    lvFaceList.Items[0].Selected = true;
+                    lvFaceList.Items[0].Checked = true;
+                    btnCancel.Enabled = true;
+                    btnStartPreview.Enabled = false;
+                    UpdateSaveBtn();
+                    UpdateCheckImageBtn();
+                    btnListPeople.Enabled = false;
+                    btnCaptureFace.Enabled = true;
+                    break;
+                case CaptureImageType.UpdatePersonCaptured:
+                    lvFaceList.Enabled = true;
+                    lvFaceList.Items[0].Selected = true;
+                    lvFaceList.Items[0].Checked = true;
+                    btnCancel.Enabled = true;
+                    btnStartPreview.Enabled = false;
+                    UpdateSaveBtn();
+                    UpdateCheckImageBtn();
+                    btnListPeople.Enabled = false;
+                    btnCaptureFace.Enabled = true;
                     break;
             }
+            txtErrorMessage.Text = captureImageType.ToString();
         }
 
         public Image Base64ToImage(string base64String)

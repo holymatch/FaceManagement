@@ -1,26 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using WebEntity;
 
 namespace RestfulClient
 {
     class Person
     {
-        public long? id { get; set; }
-        public string name { get; set; }
-        public string detail { get; set; }
-        public float? score { get; set; }
-        public string faceData { get; set; }
+        public long? Id { get; set; }
+        public string Name { get; set; }
+        public string Detail { get; set; }
+        public Face Face { get; set; }
 
-        public Person(string name, string detail, string faceData)
+        public Person(string name, string detail, Face face)
         {
             //this.id = null;
-            this.name = name;
-            this.detail = detail;
-            this.faceData = faceData;
-            this.score = null;
+            this.Name = name;
+            this.Detail = detail;
+            this.Face = face;
         }
     }
 }
