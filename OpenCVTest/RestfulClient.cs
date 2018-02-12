@@ -44,6 +44,14 @@ namespace OpenCVTest
             return await response.Content.ReadAsAsync<JsonResponseMessage<Person>>();
         }
 
+        public static async Task<JsonResponseMessage<Person>> UpdatePerson(Person person)
+        {
+            HttpResponseMessage response = await client.PutAsJsonAsync(
+                "people", person);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsAsync<JsonResponseMessage<Person>>();
+        }
+
         public static async Task<JsonResponseMessage<Person>> Recognize(WebEntity.Face face)
         {
             client.DefaultRequestHeaders.Accept.Clear();

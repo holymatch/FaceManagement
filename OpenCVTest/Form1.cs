@@ -31,6 +31,7 @@ namespace OpenCVTest
         private static int RESIZE_IMAGE_HEIGHT = 75, RESIZE_IMAGE_WIIDTH = 75;
 
         private Dictionary<String, Person> people = new Dictionary<string, Person>();
+        private Person selectedPerson = null;
         private CaptureImageType captureImageType;
 
         enum CaptureImageType
@@ -412,33 +413,77 @@ namespace OpenCVTest
 
         private async void btnAddFace_ClickAsync(object sender, EventArgs e)
         {
-            if (cropedFace != null)
-            {
-                var person = new Person(txtUsrename.Text, txtDetail.Text, new WebEntity.Face(Convert.ToBase64String(cropedFace)));
 
-                try
-                {
-                    txtErrorMessage.Text = "";
-                    var response = await RestfulClient.CreatePerson(person);
-                    if (response.ReturnCode == 200)
+            switch (captureImageType)
+            {
+                case CaptureImageType.NewPerson:
+                case CaptureImageType.NewPersonCaptured:
+                    if (cropedFace != null)
                     {
-                        txtErrorMessage.Text = "Success";
+                        var person = new Person(txtUsrename.Text, txtDetail.Text, new WebEntity.Face(Convert.ToBase64String(cropedFace)));
+
+                        try
+                        {
+                            txtErrorMessage.Text = "";
+                            var response = await RestfulClient.CreatePerson(person);
+                            if (response.ReturnCode == 200)
+                            {
+                                txtErrorMessage.Text = "Success";
+                            }
+                            else
+                            {
+                                txtErrorMessage.Text = response.Message;
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("Error on connecting server: " + ex.Message);
+                            txtErrorMessage.Text = "Error on connecting server: " + ex.Message;
+                        }
                     }
                     else
                     {
-                        txtErrorMessage.Text = response.Message;
+                        MessageBox.Show("Please capture face first.", "No face found", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
+                    break;
+                case CaptureImageType.UpdatePerson:
+                case CaptureImageType.UpdatePersonCaptured:
+                    if (cropedFace != null)
+                    {
+                        if (selectedPerson != null)
+                        {
+                            selectedPerson.Name = txtUsrename.Text;
+                            selectedPerson.Detail = txtDetail.Text;
+                            selectedPerson.Face.FaceData = Convert.ToBase64String(cropedFace);
+                        }
+                       try
+                        {
+                            txtErrorMessage.Text = "";
+                            var response = await RestfulClient.UpdatePerson(selectedPerson);
+                            if (response.ReturnCode == 200)
+                            {
+                                txtErrorMessage.Text = "Success";
+                            }
+                            else
+                            {
+                                txtErrorMessage.Text = response.Message;
+                            }
 
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Error on connecting server: " + ex.Message);
-                    txtErrorMessage.Text = "Error on connecting server: " + ex.Message;
-                }
-            } else
-            {
-                MessageBox.Show("Please capture face first.","No face found",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("Error on connecting server: " + ex.Message);
+                            txtErrorMessage.Text = "Error on connecting server: " + ex.Message;
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please capture face first.", "No face found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    break;
             }
+            
 
             UpdateFlow(FlowAction.Save);
         }
@@ -474,10 +519,10 @@ namespace OpenCVTest
                     if (lvFaceList.SelectedItems.Count > 0)
                     {
 
-                        var person = people[lvFaceList.SelectedItems[0].ImageKey];
-                        txtUsrename.Text = person.Name;
-                        txtDetail.Text = person.Detail;
-                        using (var image = new Bitmap(Base64ToImage(person.Face.FaceData)))
+                        selectedPerson = people[lvFaceList.SelectedItems[0].ImageKey];
+                        txtUsrename.Text = selectedPerson.Name;
+                        txtDetail.Text = selectedPerson.Detail;
+                        using (var image = new Bitmap(Base64ToImage(selectedPerson.Face.FaceData)))
                         {
                             imageBoxCapturedImage.Image = new Image<Bgr, Byte>(image);
                         }                        
@@ -497,6 +542,7 @@ namespace OpenCVTest
                         }*/
                     } else
                     {
+                        selectedPerson = null;
                         txtDetail.Text = "";
                         txtUsrename.Text = "";
                         txtScore.Text = "";
@@ -666,6 +712,7 @@ namespace OpenCVTest
                     {
                         people.Clear();
                     }
+                    selectedPerson = null;
                     break;
                 case CaptureImageType.NewPerson:
                     lvFaceList.Clear();
