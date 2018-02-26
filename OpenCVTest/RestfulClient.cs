@@ -19,6 +19,7 @@ namespace OpenCVTest
             //client.BaseAddress = new Uri("http://localhost:3000/");
             //client.BaseAddress = new Uri("http://192.168.11.92:3000/");
             client.BaseAddress = new Uri("http://192.168.11.92:8080/faceweb/");
+            //client.BaseAddress = new Uri("http://localhost:8080/faceweb/");
         }
 
         static async Task<Person> CreateGenAsync(String image)
@@ -40,16 +41,20 @@ namespace OpenCVTest
         {
             HttpResponseMessage response = await client.PostAsJsonAsync(
                 "people", person);
-            response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsAsync<JsonResponseMessage<Person>>();
         }
 
         public static async Task<JsonResponseMessage<Person>> UpdatePerson(Person person)
         {
             HttpResponseMessage response = await client.PutAsJsonAsync(
-                "people", person);
-            response.EnsureSuccessStatusCode();
+                "people/" + person.Id, person);
             return await response.Content.ReadAsAsync<JsonResponseMessage<Person>>();
+        }
+
+        public static async Task<HttpResponseMessage> RemovePerson(Person person)
+        {
+            HttpResponseMessage response = await client.DeleteAsync("people/" + person.Id);
+            return response;
         }
 
         public static async Task<JsonResponseMessage<Person>> Recognize(WebEntity.Face face)

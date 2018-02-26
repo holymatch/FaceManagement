@@ -17,6 +17,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using Newtonsoft.Json;
 using RestfulClient;
+using System.Net;
 
 namespace OpenCVTest
 {
@@ -51,6 +52,7 @@ namespace OpenCVTest
             SelectFace,
             Cancel,
             Save,
+            Remove,
             List
         }
 
@@ -64,25 +66,27 @@ namespace OpenCVTest
             UpdateBtnStatus(CaptureImageType.None);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void BtnCaptureFace_Click(object sender, EventArgs e)
         {
             if (tracker.TrackingFaces.Count > 0)
             {
                 //Rectangle cropRect = new Rectangle()
                 //Rectanle cropRect = tracker.TrackingFaces.First.Value.humanFace.faceRectangle;
-                imageBoxCapturedImage.Image = tracker.TrackingFaces.First.Value.humanFace.face;
+                ImageBoxCapturedImage.Image = tracker.TrackingFaces.First.Value.humanFace.face;
                 //cropedFace = tracker.TrackingFaces.First.Value.humanFace.face.ToJpegData();
 
-                var imageList = new ImageList();
-                imageList.ImageSize = new Size(72, 72);
-                imageList.ColorDepth = ColorDepth.Depth32Bit;
-                lvFaceList.Clear();
+                var imageList = new ImageList
+                {
+                    ImageSize = new Size(72, 72),
+                    ColorDepth = ColorDepth.Depth32Bit
+                };
+                LvFaceList.Clear();
                 int i = 0;
-                lvFaceList.LargeImageList = imageList;
+                LvFaceList.LargeImageList = imageList;
                 foreach (FaceTracker tracker in tracker.TrackingFaces)
                 {
                     imageList.Images.Add(i.ToString(), tracker.humanFace.face.Bitmap);
-                    lvFaceList.Items.Add(i.ToString(), i.ToString());
+                    LvFaceList.Items.Add(i.ToString(), i.ToString());
                     i++;
                 }
                 UpdateFlow(FlowAction.CaptureFace);
@@ -110,124 +114,29 @@ namespace OpenCVTest
                         }                        
                         tracker.trackFace(imageFrame);
                     //}
-                    imgCamUser.Image = imageFrame;
+                    ImgCamUser.Image = imageFrame;
                 }                    
             }
                 
         }
 
-        //void Application_Idle(object sender, EventArgs e)
-        //{
-        //    //顯示影像到PictureBox上
-        //    if (frameCount == 0)
-        //    {
-        //        using (var imageFrame = _capture.QueryFrame().ToImage<Bgr, Byte>())
-        //        {
-        //            if (imageFrame != null)
-        //            {
-        //                var faceDetector = new FaceDetector();
-        //                var faces = faceDetector.findHumanFace(imageFrame);
-                        
-        //                if (faces.Count > 0)
-        //                {
-        //                    var grayframe = imageFrame.Convert<Gray, byte>();
-        //                    frameCount++;
-        //                    //tracker.Init(grayframe.Mat, faces[0].faceRectangle);
-        //                }
-        //                /*
-        //                var grayframe = imageFrame.Convert<Gray, byte>();
-        //                var faces = _cascadeClassifier.DetectMultiScale(grayframe, 1.1, 10, Size.Empty); //the actual face detection happens here
 
-                        
-                        
-        //                foreach (var face in faces)
-        //                {
-        //                    Bitmap facetarget = new Bitmap(face.Width, face.Height);
-        //                    using (Graphics g = Graphics.FromImage(facetarget))
-        //                    {
-        //                        g.DrawImage(grayframe.Bitmap, new Rectangle(0, 0, facetarget.Width, facetarget.Height), face, GraphicsUnit.Pixel);
-        //                    }
-        //                    Image<Gray, Byte> faceImage = new Image<Gray, Byte>(facetarget);
-        //                    var eyes = _cascadeEyeClassifier.DetectMultiScale(faceImage, 1.3, 5, Size.Empty);
-
-        //                    Debug.Print("Eye count : {0}", eyes.Count());
-        //                    if (eyes.Count() == 2)
-        //                    {
-        //                        foreach (var eye in eyes)
-        //                        {
-        //                            imageFrame.Draw(new Rectangle(face.X + eye.X, face.Y + eye.Y, eye.Width, eye.Height), new Bgr(Color.Green), 1); //the detected face(s) is highlighted here using a box that is drawn around it/them
-        //                            if (this.txtUsrename.Text.Trim() != String.Empty)
-        //                            {
-
-        //                                Bitmap target = new Bitmap(face.Width, face.Height);
-        //                                using (Graphics g = Graphics.FromImage(target))
-        //                                {
-        //                                    g.DrawImage(grayframe.Bitmap, new Rectangle(0, 0, target.Width, target.Height), face, GraphicsUnit.Pixel);
-        //                                }
-        //                                //saveFace(target);
-        //                            }
-        //                        }
-        //                        _face = face;
-        //                        imageFrame.Draw(face, new Bgr(Color.BurlyWood), 3); //the detected face(s) is highlighted here using a box that is drawn around it/them
-        //                        frameCount++;
-        //                        tracker.Init(grayframe.Mat, face);
-        //                    }
-        //                }
-        //                */
-        //            }
-
-        //            imgCamUser.Image = imageFrame;
-        //        }
-        //    } else
-        //    {
-        //        Debug.Print("Carmer size: {0}", _capture.QueryFrame().Size);
-        //        using (var imageFrame = _capture.QueryFrame().ToImage<Bgr, Byte>())
-        //        {
-        //            // Read frame. 
-        //            if (imageFrame != null)
-        //            {
-        //                var grayframe = imageFrame.Convert<Gray, byte>();
-        //                /*
-        //                try
-        //                {
-
-        //                    var result = tracker.Update(grayframe.Mat, out trackingFace);
-        //                    Debug.Print("Tracking result : {0}", result.ToString());
-        //                    if (!result)
-        //                    {
-        //                        frameCount = 0;
-        //                        var faceDetector = new FaceDetector();
-        //                        faceDetector.getImageWithFace(imageFrame);
-        //                        imgCamUser.Image = imageFrame;
-        //                        return;
-        //                    }                            
-        //                    imageFrame.Draw(trackingFace, new Bgr(Color.Red), 3);
-        //                } catch (Exception ex)
-        //                {
-        //                    Debug.Print(ex.ToString());
-        //                }
-        //                */
-                        
-        //            }
-        //            frameCount++;
-        //            imgCamUser.Image = imageFrame;
-        //            if (frameCount > 27)
-        //            {
-        //                frameCount = 0;
-        //            }
-        //        }
-
-        //    }       
-
-        //}
-
-        private void button2_Click(object sender, EventArgs e)
+        private async void BtnDeletePerson_Click(object sender, EventArgs e)
         {
-            FaceRecognizer recognizer = new FaceRecognizer();
-           
+            var response = await RestfulClient.RemovePerson(selectedPerson);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                TxtErrorMessage.Text = "Remove success.";
+
+            } else
+            {
+                TxtErrorMessage.Text = "Unable to remove person.";
+            }
+
+            UpdateFlow(FlowAction.Remove);
         }
 
-        private void saveFace(Bitmap face)
+        private void SaveFace(Bitmap face)
         {
             
             if (txtUsrename.Text.Trim() != String.Empty)
@@ -249,7 +158,7 @@ namespace OpenCVTest
         private void button3_Click(object sender, EventArgs e)
         {
             _capture = new VideoCapture();
-            imgCamUser.Image = _capture.QueryFrame();
+            ImgCamUser.Image = _capture.QueryFrame();
 
             FaceRecognizer recognizer = new FaceRecognizer();
             recognizer.LoadRecognizerData();
@@ -312,10 +221,10 @@ namespace OpenCVTest
             myForm.Show();
         }
 
-        private void btnStart_Click(object sender, EventArgs e)
+        private void BtnStart_Click(object sender, EventArgs e)
         {
             _capture = new VideoCapture();
-            imgCamUser.Image = _capture.QueryFrame();
+            ImgCamUser.Image = _capture.QueryFrame();
             UpdateFlow(FlowAction.StartPreview);
             Application.Idle += Tracking;
         }
@@ -329,14 +238,14 @@ namespace OpenCVTest
                 _capture.Dispose();
                 _capture = null;
             }
-            if (imgCamUser.Image != null)
+            if (ImgCamUser.Image != null)
             {
-                imgCamUser.Image.Dispose();
-                imgCamUser.Image = null;
+                ImgCamUser.Image.Dispose();
+                ImgCamUser.Image = null;
             }            
         }
 
-        private async void btnCheckFace_ClickAsync(object sender, EventArgs e)
+        private async void BtnCheckFace_ClickAsync(object sender, EventArgs e)
         {
             txtUsrename.Text = "";
             txtDetail.Text = "";
@@ -351,16 +260,16 @@ namespace OpenCVTest
                     txtUsrename.Text = response.Content.Name;
                     txtScore.Text = response.Content.Face.Score.ToString();
                     txtDetail.Text = response.Content.Detail;
-                    txtErrorMessage.Text = response.Message;
+                    TxtErrorMessage.Text = response.Message;
                 }
                 else
                 {
-                    txtErrorMessage.Text = response.Message;
+                    TxtErrorMessage.Text = response.Message;
                 }
             } catch(Exception ex)
             {
                 Debug.WriteLine("Error on connecting server: " + ex.Message);
-                txtErrorMessage.Text = "Error on connecting server: " + ex.Message;
+                TxtErrorMessage.Text = "Error on connecting server: " + ex.Message;
             }
             
             
@@ -370,116 +279,66 @@ namespace OpenCVTest
             Console.WriteLine(String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10));
         }
 
-        private async void btnListPeople_Click(object sender, EventArgs e)
+        private void BtnListPeople_Click(object sender, EventArgs e)
         {
-            try
-            {
-                txtErrorMessage.Text = "";
-                var response = await RestfulClient.ListPeople();
-                if (response.ReturnCode == 200)
-                {
-                    var l_people = response.Content;
-                    var imageList = new ImageList();
-                    imageList.ImageSize = new Size(72, 72);
-                    imageList.ColorDepth = ColorDepth.Depth32Bit;
-                    lvFaceList.Clear();
-                    foreach (Person person in l_people )
-                    {
-                        if (person.Face != null && person.Face.FaceData != null)
-                        {
-                            people.Add(person.Face.Identify.ToString(), person);
-                            imageList.Images.Add(person.Face.Identify.ToString(), Base64ToImage(person.Face.FaceData));
-                            lvFaceList.LargeImageList = imageList;
-                            lvFaceList.Items.Add(person.Name, person.Face.Identify.ToString());
-                        }
-                    }
-                    lvFaceList.LargeImageList = imageList;
-                    txtErrorMessage.Text = "Success";
-                }
-                else
-                {
-                    txtErrorMessage.Text = response.Message;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                
-                Debug.WriteLine("Error on connecting server: " + ex.Message);
-                Debug.WriteLine(ex.StackTrace);
-                txtErrorMessage.Text = "Error on connecting server: " + ex.Message;
-            }
+            ListFaceFromServer();
         }
 
-        private async void btnAddFace_ClickAsync(object sender, EventArgs e)
+        private async void BtnAddFace_ClickAsync(object sender, EventArgs e)
         {
-
             switch (captureImageType)
             {
                 case CaptureImageType.NewPerson:
                 case CaptureImageType.NewPersonCaptured:
-                    if (cropedFace != null)
                     {
-                        var person = new Person(txtUsrename.Text, txtDetail.Text, new WebEntity.Face(Convert.ToBase64String(cropedFace)));
-
-                        try
+                        if (cropedFace != null)
                         {
-                            txtErrorMessage.Text = "";
+                            var person = new Person(txtUsrename.Text, txtDetail.Text, new WebEntity.Face(Convert.ToBase64String(cropedFace)));
+
+                            TxtErrorMessage.Text = "";
                             var response = await RestfulClient.CreatePerson(person);
                             if (response.ReturnCode == 200)
                             {
-                                txtErrorMessage.Text = "Success";
+                                TxtErrorMessage.Text = "Success";
                             }
                             else
                             {
-                                txtErrorMessage.Text = response.Message;
+                                TxtErrorMessage.Text = response.Message;
+                                return;
                             }
-
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            Debug.WriteLine("Error on connecting server: " + ex.Message);
-                            txtErrorMessage.Text = "Error on connecting server: " + ex.Message;
+                            MessageBox.Show("Please capture face first.", "No face found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
                         }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Please capture face first.", "No face found", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    }                    
                     break;
+                case CaptureImageType.CurrentPerson:
                 case CaptureImageType.UpdatePerson:
                 case CaptureImageType.UpdatePersonCaptured:
-                    if (cropedFace != null)
                     {
                         if (selectedPerson != null)
                         {
                             selectedPerson.Name = txtUsrename.Text;
                             selectedPerson.Detail = txtDetail.Text;
-                            selectedPerson.Face.FaceData = Convert.ToBase64String(cropedFace);
+                            if (cropedFace != null)
+                            {
+                                selectedPerson.Face.FaceData = Convert.ToBase64String(cropedFace);
+                            }
                         }
-                       try
-                        {
-                            txtErrorMessage.Text = "";
-                            var response = await RestfulClient.UpdatePerson(selectedPerson);
-                            if (response.ReturnCode == 200)
-                            {
-                                txtErrorMessage.Text = "Success";
-                            }
-                            else
-                            {
-                                txtErrorMessage.Text = response.Message;
-                            }
 
-                        }
-                        catch (Exception ex)
+                        TxtErrorMessage.Text = "";
+                        var response = await RestfulClient.UpdatePerson(selectedPerson);
+                        if (response.ReturnCode == 200)
                         {
-                            Debug.WriteLine("Error on connecting server: " + ex.Message);
-                            txtErrorMessage.Text = "Error on connecting server: " + ex.Message;
+                            TxtErrorMessage.Text = "Success";
                         }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Please capture face first.", "No face found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        else
+                        {
+                            TxtErrorMessage.Text = response.Message;
+                            return;
+                        }
                     }
                     break;
             }
@@ -488,43 +347,43 @@ namespace OpenCVTest
             UpdateFlow(FlowAction.Save);
         }
 
-        private void lvFaceList_SelectedIndexChanged(object sender, EventArgs e)
+        private void LvFaceList_SelectedIndexChanged(object sender, EventArgs e)
         {
             switch (captureImageType)
             {
                 case CaptureImageType.NewPersonCaptured:
-                    if (lvFaceList.SelectedItems.Count > 0)
+                    if (LvFaceList.SelectedItems.Count > 0)
                     {
-                        var imageIndex = lvFaceList.LargeImageList.Images.IndexOfKey(lvFaceList.SelectedItems[0].ImageKey);
-                        if (imageIndex > -1 && imageIndex < lvFaceList.LargeImageList.Images.Count)
+                        var imageIndex = LvFaceList.LargeImageList.Images.IndexOfKey(LvFaceList.SelectedItems[0].ImageKey);
+                        if (imageIndex > -1 && imageIndex < LvFaceList.LargeImageList.Images.Count)
                         {
-                            using (Bitmap bmpImage = new Bitmap(lvFaceList.LargeImageList.Images[imageIndex]))
+                            using (Bitmap bmpImage = new Bitmap(LvFaceList.LargeImageList.Images[imageIndex]))
                             {
-                                imageBoxCapturedImage.Image = new Image<Bgr, Byte>(bmpImage);
+                                ImageBoxCapturedImage.Image = new Image<Bgr, Byte>(bmpImage);
                                 cropedFace = tracker.TrackingFaces.ElementAt(imageIndex).humanFace.face.Resize(RESIZE_IMAGE_WIIDTH, RESIZE_IMAGE_HEIGHT, Emgu.CV.CvEnum.Inter.Cubic).ToJpegData();
                             }
                         }
                     } else
                     {
-                        if (imageBoxCapturedImage.Image != null)
+                        if (ImageBoxCapturedImage.Image != null)
                         {
-                            imageBoxCapturedImage.Image.Dispose();
-                            imageBoxCapturedImage.Image = null;
+                            ImageBoxCapturedImage.Image.Dispose();
+                            ImageBoxCapturedImage.Image = null;
                             cropedFace = null;
                         }
                     }
                     break;
                 case CaptureImageType.None:
                 case CaptureImageType.CurrentPerson:
-                    if (lvFaceList.SelectedItems.Count > 0)
+                    if (LvFaceList.SelectedItems.Count > 0)
                     {
 
-                        selectedPerson = people[lvFaceList.SelectedItems[0].ImageKey];
+                        selectedPerson = people[LvFaceList.SelectedItems[0].ImageKey];
                         txtUsrename.Text = selectedPerson.Name;
                         txtDetail.Text = selectedPerson.Detail;
                         using (var image = new Bitmap(Base64ToImage(selectedPerson.Face.FaceData)))
                         {
-                            imageBoxCapturedImage.Image = new Image<Bgr, Byte>(image);
+                            ImageBoxCapturedImage.Image = new Image<Bgr, Byte>(image);
                         }                        
                         /*
                         var imageIndex = lvFaceList.LargeImageList.Images.IndexOfKey(lvFaceList.SelectedItems[0].ImageKey);
@@ -546,10 +405,10 @@ namespace OpenCVTest
                         txtDetail.Text = "";
                         txtUsrename.Text = "";
                         txtScore.Text = "";
-                        if (imageBoxCapturedImage.Image != null)
+                        if (ImageBoxCapturedImage.Image != null)
                         {
-                            imageBoxCapturedImage.Image.Dispose();
-                            imageBoxCapturedImage.Image = null;
+                            ImageBoxCapturedImage.Image.Dispose();
+                            ImageBoxCapturedImage.Image = null;
                             cropedFace = null;
                         }
                     }
@@ -563,9 +422,53 @@ namespace OpenCVTest
             UpdateFlow(FlowAction.SelectFace);
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         {
             UpdateFlow(FlowAction.Cancel);
+        }
+
+        private async void ListFaceFromServer()
+        {
+            try
+            {
+                TxtErrorMessage.Text = "";
+                var response = await RestfulClient.ListPeople();
+                if (response.ReturnCode == 200)
+                {
+                    var l_people = response.Content;
+                    var imageList = new ImageList
+                    {
+                        ImageSize = new Size(72, 72),
+                        ColorDepth = ColorDepth.Depth32Bit
+                    };
+                    LvFaceList.Clear();
+                    people.Clear();
+                    foreach (Person person in l_people)
+                    {
+                        if (person.Face != null && person.Face.FaceData != null)
+                        {
+                            people.Add(person.Face.Identify.ToString(), person);
+                            imageList.Images.Add(person.Face.Identify.ToString(), Base64ToImage(person.Face.FaceData));
+                            LvFaceList.LargeImageList = imageList;
+                            LvFaceList.Items.Add(person.Name, person.Face.Identify.ToString());
+                        }
+                    }
+                    LvFaceList.LargeImageList = imageList;
+                    TxtErrorMessage.Text = "Success";
+                }
+                else
+                {
+                    TxtErrorMessage.Text = response.Message;
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                Debug.WriteLine("Error on connecting server: " + ex.Message);
+                Debug.WriteLine(ex.StackTrace);
+                TxtErrorMessage.Text = "Error on connecting server: " + ex.Message;
+            }
         }
 
         private void UpdateFlow(FlowAction action)
@@ -582,6 +485,9 @@ namespace OpenCVTest
                             UpdateBtnStatus(CaptureImageType.CurrentPerson);
                             break;
                         case FlowAction.List:
+                            break;
+                        case FlowAction.Remove:
+                            UpdateBtnStatus(CaptureImageType.None);
                             break;
                     }
                     break;
@@ -608,6 +514,7 @@ namespace OpenCVTest
                             UpdateBtnStatus(CaptureImageType.None);
                             break;
                         case FlowAction.Save:
+                            UpdateBtnStatus(CaptureImageType.None);
                             break;
                     }
                     break;
@@ -625,6 +532,10 @@ namespace OpenCVTest
                             UpdateBtnStatus(CaptureImageType.None);
                             break;
                         case FlowAction.Save:
+                            UpdateBtnStatus(CaptureImageType.None);
+                            break;
+                        case FlowAction.Remove:
+                            UpdateBtnStatus(CaptureImageType.None);
                             break;
                     }
                     break;
@@ -639,6 +550,7 @@ namespace OpenCVTest
                             UpdateBtnStatus(CaptureImageType.None);
                             break;
                         case FlowAction.Save:
+                            UpdateBtnStatus(CaptureImageType.None);
                             break;
                     }
                     break;
@@ -654,6 +566,7 @@ namespace OpenCVTest
                             UpdateBtnStatus(CaptureImageType.None);
                             break;
                         case FlowAction.Save:
+                            UpdateBtnStatus(CaptureImageType.None);
                             break;
                     }
                     break;
@@ -664,22 +577,34 @@ namespace OpenCVTest
         {
             if (cropedFace != null)
             {
-                btnCheckFace.Enabled = true;
+                BtnCheckFace.Enabled = true;
             } else
             {
-                btnCheckFace.Enabled = false;
+                BtnCheckFace.Enabled = false;
             }
         }
 
         private void UpdateSaveBtn()
         {
-            if (cropedFace != null || (captureImageType == CaptureImageType.CurrentPerson && lvFaceList.SelectedItems.Count>0))
+            if (cropedFace != null || (captureImageType == CaptureImageType.CurrentPerson && LvFaceList.SelectedItems.Count>0))
             {
-                btnSaveFace.Enabled = true;
+                BtnSaveFace.Enabled = true;
             }
             else
             {
-                btnSaveFace.Enabled = false;
+                BtnSaveFace.Enabled = false;
+            }
+        }
+
+        private void UpdateDeleteBtn()
+        {
+            if ((captureImageType == CaptureImageType.None || captureImageType == CaptureImageType.CurrentPerson ) && LvFaceList.SelectedItems.Count > 0)
+            {
+                BtnDeletePerson.Enabled = true;
+            }
+            else
+            {
+                BtnDeletePerson.Enabled = false;
             }
         }
 
@@ -693,16 +618,16 @@ namespace OpenCVTest
                     txtDetail.Text = "";
                     txtScore.Text = "";
                     txtUsrename.Text = "";
-                    lvFaceList.Clear();
-                    lvFaceList.Enabled = true;
-                    imageBoxCapturedImage.Image = null;
-                    btnCancel.Enabled = false;
-                    btnStartPreview.Enabled = true;
-                    btnStartPreview.Text = "New Person";
-                    btnSaveFace.Enabled = false;
-                    btnCheckFace.Enabled = false;
-                    btnListPeople.Enabled = true;
-                    btnCaptureFace.Enabled = false;
+                    LvFaceList.Clear();
+                    LvFaceList.Enabled = true;
+                    ImageBoxCapturedImage.Image = null;
+                    BtnCancel.Enabled = false;
+                    BtnStartPreview.Enabled = true;
+                    BtnStartPreview.Text = "New Person";
+                    BtnSaveFace.Enabled = false;
+                    BtnCheckFace.Enabled = false;
+                    BtnListPeople.Enabled = true;
+                    BtnCaptureFace.Enabled = false;
                     if (tracker != null)
                     {
                         tracker.Dispose();
@@ -713,60 +638,73 @@ namespace OpenCVTest
                         people.Clear();
                     }
                     selectedPerson = null;
+                    ListFaceFromServer();
+                    UpdateDeleteBtn();
                     break;
                 case CaptureImageType.NewPerson:
-                    lvFaceList.Clear();
-                    lvFaceList.Enabled = false;
-                    btnCancel.Enabled = true;
-                    btnStartPreview.Enabled = false;
-                    btnSaveFace.Enabled = false;
-                    btnCheckFace.Enabled = false;
-                    btnListPeople.Enabled = false;
-                    btnCaptureFace.Enabled = true;
+                    LvFaceList.Clear();
+                    LvFaceList.Enabled = false;
+                    BtnCancel.Enabled = true;
+                    BtnStartPreview.Enabled = false;
+                    BtnSaveFace.Enabled = false;
+                    BtnCheckFace.Enabled = false;
+                    BtnListPeople.Enabled = false;
+                    BtnCaptureFace.Enabled = true;
+                    UpdateDeleteBtn();
                     break;
                 case CaptureImageType.CurrentPerson:
-                    btnCancel.Enabled = true;
-                    btnStartPreview.Enabled = true;
-                    btnStartPreview.Text = "Start Preview";
+                    BtnCancel.Enabled = true;
+                    BtnStartPreview.Enabled = true;
+                    BtnStartPreview.Text = "Start Preview";
                     UpdateSaveBtn();
-                    btnCheckFace.Enabled = false;
-                    btnListPeople.Enabled = false;
-                    btnCaptureFace.Enabled = false;
+                    BtnCheckFace.Enabled = false;
+                    BtnListPeople.Enabled = false;
+                    BtnCaptureFace.Enabled = false;
+                    UpdateDeleteBtn();
                     break;
                 case CaptureImageType.UpdatePerson:
-                    lvFaceList.Clear();
-                    lvFaceList.Enabled = false;
-                    btnCancel.Enabled = true;
-                    btnStartPreview.Enabled = false;
-                    btnSaveFace.Enabled = false;
-                    btnCheckFace.Enabled = false;
-                    btnListPeople.Enabled = false;
-                    btnCaptureFace.Enabled = true;
+                    LvFaceList.Clear();
+                    LvFaceList.Enabled = false;
+                    BtnCancel.Enabled = true;
+                    BtnStartPreview.Enabled = false;
+                    BtnSaveFace.Enabled = false;
+                    BtnCheckFace.Enabled = false;
+                    BtnListPeople.Enabled = false;
+                    BtnCaptureFace.Enabled = true;
+                    UpdateDeleteBtn();
                     break;
                 case CaptureImageType.NewPersonCaptured:
-                    lvFaceList.Enabled = true;
-                    lvFaceList.Items[0].Selected = true;
-                    lvFaceList.Items[0].Checked = true;
-                    btnCancel.Enabled = true;
-                    btnStartPreview.Enabled = false;
+                    LvFaceList.Enabled = true;
+                    LvFaceList.Items[0].Selected = true;
+                    LvFaceList.Items[0].Checked = true;
+                    BtnCancel.Enabled = true;
+                    BtnStartPreview.Enabled = false;
                     UpdateSaveBtn();
                     UpdateCheckImageBtn();
-                    btnListPeople.Enabled = false;
-                    btnCaptureFace.Enabled = true;
+                    BtnListPeople.Enabled = false;
+                    BtnCaptureFace.Enabled = true;
+                    UpdateDeleteBtn();
                     break;
                 case CaptureImageType.UpdatePersonCaptured:
-                    lvFaceList.Enabled = true;
-                    lvFaceList.Items[0].Selected = true;
-                    lvFaceList.Items[0].Checked = true;
-                    btnCancel.Enabled = true;
-                    btnStartPreview.Enabled = false;
+                    LvFaceList.Enabled = true;
+                    LvFaceList.Items[0].Selected = true;
+                    LvFaceList.Items[0].Checked = true;
+                    BtnCancel.Enabled = true;
+                    BtnStartPreview.Enabled = false;
                     UpdateSaveBtn();
                     UpdateCheckImageBtn();
-                    btnListPeople.Enabled = false;
-                    btnCaptureFace.Enabled = true;
+                    BtnListPeople.Enabled = false;
+                    BtnCaptureFace.Enabled = true;
+                    UpdateDeleteBtn();
                     break;
             }
-            txtErrorMessage.Text = captureImageType.ToString();
+            TxtErrorMessage.Text = captureImageType.ToString();
+        }
+
+        private void BtnImportImage_Click(object sender, EventArgs e)
+        {
+            var importFace = new ImportFace();
+            importFace.Show();
         }
 
         public Image Base64ToImage(string base64String)

@@ -81,6 +81,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
@@ -120,6 +121,12 @@
     </Compile>
     <Compile Include="HumanFace.cs" />
     <Compile Include="IDataStoreAccess.cs" />
+    <Compile Include="ImportFace.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportFace.Designer.cs">
+      <DependentUpon>ImportFace.cs</DependentUpon>
+    </Compile>
     <Compile Include="MutliFaceTracker.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="Program.cs" />
@@ -130,6 +137,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmOverlapTest.resx">
       <DependentUpon>frmOverlapTest.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportFace.resx">
+      <DependentUpon>ImportFace.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
