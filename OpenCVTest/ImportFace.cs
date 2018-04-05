@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -52,10 +53,18 @@ namespace OpenCVTest
                     var filename = Path.GetFileNameWithoutExtension(file);
                     Byte[] bytes = File.ReadAllBytes(file);
                     String image = Convert.ToBase64String(bytes);
-                    if (!(await ImportFaceToServerAsync(new Person(filename, "", new WebEntity.Face(image)))))
+                    try
                     {
+                        if (!(await ImportFaceToServerAsync(new Person(filename, "", new WebEntity.Face(image)))))
+                        {
+                            LstFailBox.Items.Add(file);
+                        }
+                    } catch (Exception ex)
+                    {
+                        Debug.WriteLine("Error import image: " + ex);
                         LstFailBox.Items.Add(file);
                     }
+                    
                 }
             }
         }

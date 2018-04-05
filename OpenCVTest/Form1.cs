@@ -638,7 +638,7 @@ namespace OpenCVTest
                         people.Clear();
                     }
                     selectedPerson = null;
-                    ListFaceFromServer();
+                    //ListFaceFromServer();
                     UpdateDeleteBtn();
                     break;
                 case CaptureImageType.NewPerson:
