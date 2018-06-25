@@ -29,7 +29,7 @@ namespace OpenCVTest
 
         public void LoadRecognizerData()
         {
-            _faceRecognizer.Load(_recognizerFilePath);
+            _faceRecognizer.Read(_recognizerFilePath);
         }
 
         public int RecognizeUser(Image<Gray, byte> userImage)
@@ -37,7 +37,7 @@ namespace OpenCVTest
             /*  Stream stream = new MemoryStream();
               stream.Write(userImage, 0, userImage.Length);
               var faceImage = new Image<Gray, byte>(new Bitmap(stream));*/
-            _faceRecognizer.Load(_recognizerFilePath);
+            _faceRecognizer.Read(_recognizerFilePath);
 
             var result = _faceRecognizer.Predict(userImage.Resize(100, 100, Inter.Cubic));
             Debug.Print("Face recognizer result Label:Distance {0}:{1}", result.Label,result.Distance );

@@ -27,7 +27,7 @@ namespace OpenCVTest
 
         public FaceTracker(HumanFace face)
         {
-            tracker = new Tracker(TRACKERTYPE);
+            tracker = new TrackerMedianFlow(10, new Size(3, 3), 5, new MCvTermCriteria(20, 0.3), new Size(30, 30));
             humanFace = face;
             findFace = false;
             isInit = false;
@@ -37,7 +37,7 @@ namespace OpenCVTest
 
         private FaceTracker()
         {
-            tracker = new Tracker(TRACKERTYPE);
+            tracker = new TrackerMedianFlow(10, new Size(3,3), 5, new MCvTermCriteria(20, 0.3), new Size(30,30));
         }
 
         public bool trackFace(Image<Bgr, byte> bgrImage)
