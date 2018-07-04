@@ -15,8 +15,10 @@ namespace FaceManagement
 {
     class FaceTracker : IDisposable
     {
-
+        private const int SUCCESSRETRYFRAMECOUNT = 120;
         private const string TRACKERTYPE = "MEDIANFLOW";
+        private const float INTERSECTRATIO = 0.3f;
+
         private Tracker tracker;
         public bool findFace { get; set; }
         public int failFrameCount { get; set; } //The frame that can't track the face
@@ -24,8 +26,10 @@ namespace FaceManagement
         public HumanFace humanFace { get; set; }
         public Person Person { get; set; }
         public bool FailToRecognize { get; set; }
+        public int successFrameCount { get; set; }
+        public bool missingFace{ get; set; }
 
-        public FaceTracker(HumanFace face)
+    public FaceTracker(HumanFace face)
         {
             tracker = new TrackerMedianFlow(10, new Size(3, 3), 5, new MCvTermCriteria(20, 0.3), new Size(30, 30));
             humanFace = face;
@@ -33,6 +37,7 @@ namespace FaceManagement
             isInit = false;
             failFrameCount = 0;
             FailToRecognize = false;
+            missingFace = false;
         }
 
         private FaceTracker()
@@ -110,10 +115,55 @@ namespace FaceManagement
                                 if (FailToRecognize)
                                 {
                                     failFrameCount++;
+                                    successFrameCount = 0;
                                 }
                                 else
                                 {
                                     failFrameCount = 0;
+                                    if (successFrameCount > SUCCESSRETRYFRAMECOUNT)
+                                    {
+                                        FaceDetector faceDetector = new FaceDetector();
+                                        
+                                        var detectedFaces = faceDetector.findFace(bgrImage);
+                                        var sameFaceFind = false;
+                                        foreach (var r1 in detectedFaces)
+                                        {
+                                            var r1Size = r1.Height * r1.Width;
+                                            var r2 = humanFace.faceRectangle;
+                                            float r2Size = r2.Height * r2.Width;
+                                            var r3 = Rectangle.Intersect(r1, r2);
+                                            if (!r3.IsEmpty)
+                                            {
+                                                float r3Size = r3.Height * r3.Width;
+                                                float ratio = r3Size / Math.Min(r1Size, r2Size);
+                                                if (ratio < INTERSECTRATIO)
+                                                {
+
+                                                    Debug.Print("Face compare, Ratio: {0}", ratio);
+                                                }
+                                                else
+                                                {
+                                                    sameFaceFind = true;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Debug.Print("r3 is empty");
+                                            }
+                                        }
+                                        
+                                        
+
+                                        if (!sameFaceFind)
+                                        {
+                                            missingFace = true;
+                                        }
+                                        faceDetector = null;
+                                        successFrameCount = 0;
+                                    } else
+                                    {
+                                        successFrameCount++;
+                                    }                                    
                                 }
                             }
                         }

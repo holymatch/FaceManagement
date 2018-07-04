@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.BtnCaptureFace = new System.Windows.Forms.Button();
             this.ImgCamUser = new Emgu.CV.UI.ImageBox();
             this.BtnDeletePerson = new System.Windows.Forms.Button();
@@ -58,7 +59,7 @@
             // BtnCaptureFace
             // 
             this.BtnCaptureFace.Location = new System.Drawing.Point(1951, 574);
-            this.BtnCaptureFace.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnCaptureFace.Margin = new System.Windows.Forms.Padding(4);
             this.BtnCaptureFace.Name = "BtnCaptureFace";
             this.BtnCaptureFace.Size = new System.Drawing.Size(163, 59);
             this.BtnCaptureFace.TabIndex = 0;
@@ -69,7 +70,7 @@
             // ImgCamUser
             // 
             this.ImgCamUser.Location = new System.Drawing.Point(20, 20);
-            this.ImgCamUser.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ImgCamUser.Margin = new System.Windows.Forms.Padding(4);
             this.ImgCamUser.Name = "ImgCamUser";
             this.ImgCamUser.Size = new System.Drawing.Size(1247, 886);
             this.ImgCamUser.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -79,7 +80,7 @@
             // BtnDeletePerson
             // 
             this.BtnDeletePerson.Location = new System.Drawing.Point(1951, 642);
-            this.BtnDeletePerson.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnDeletePerson.Margin = new System.Windows.Forms.Padding(4);
             this.BtnDeletePerson.Name = "BtnDeletePerson";
             this.BtnDeletePerson.Size = new System.Drawing.Size(163, 55);
             this.BtnDeletePerson.TabIndex = 3;
@@ -90,7 +91,7 @@
             // txtUsrename
             // 
             this.txtUsrename.Location = new System.Drawing.Point(1753, 414);
-            this.txtUsrename.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtUsrename.Margin = new System.Windows.Forms.Padding(4);
             this.txtUsrename.Name = "txtUsrename";
             this.txtUsrename.Size = new System.Drawing.Size(167, 29);
             this.txtUsrename.TabIndex = 4;
@@ -98,7 +99,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(1753, 380);
+            this.label1.Location = new System.Drawing.Point(1763, 385);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(102, 25);
@@ -108,18 +109,19 @@
             // button3
             // 
             this.button3.Location = new System.Drawing.Point(1951, 707);
-            this.button3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button3.Margin = new System.Windows.Forms.Padding(4);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(163, 55);
             this.button3.TabIndex = 6;
             this.button3.Text = "Recognize";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Visible = false;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // button4
             // 
             this.button4.Location = new System.Drawing.Point(1951, 833);
-            this.button4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button4.Margin = new System.Windows.Forms.Padding(4);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(163, 55);
             this.button4.TabIndex = 7;
@@ -131,29 +133,30 @@
             // button5
             // 
             this.button5.Location = new System.Drawing.Point(1951, 770);
-            this.button5.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button5.Margin = new System.Windows.Forms.Padding(4);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(163, 54);
             this.button5.TabIndex = 8;
             this.button5.Text = "Overlap Test";
             this.button5.UseVisualStyleBackColor = true;
+            this.button5.Visible = false;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // BtnStartPreview
             // 
             this.BtnStartPreview.Location = new System.Drawing.Point(1753, 574);
-            this.BtnStartPreview.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnStartPreview.Margin = new System.Windows.Forms.Padding(4);
             this.BtnStartPreview.Name = "BtnStartPreview";
             this.BtnStartPreview.Size = new System.Drawing.Size(171, 59);
             this.BtnStartPreview.TabIndex = 10;
-            this.BtnStartPreview.Text = "New Person";
+            this.BtnStartPreview.Text = "Preview";
             this.BtnStartPreview.UseVisualStyleBackColor = true;
             this.BtnStartPreview.Click += new System.EventHandler(this.BtnStart_Click);
             // 
             // ImageBoxCapturedImage
             // 
             this.ImageBoxCapturedImage.Location = new System.Drawing.Point(1780, 20);
-            this.ImageBoxCapturedImage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ImageBoxCapturedImage.Margin = new System.Windows.Forms.Padding(4);
             this.ImageBoxCapturedImage.Name = "ImageBoxCapturedImage";
             this.ImageBoxCapturedImage.Size = new System.Drawing.Size(308, 329);
             this.ImageBoxCapturedImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -163,7 +166,7 @@
             // BtnCheckFace
             // 
             this.BtnCheckFace.Location = new System.Drawing.Point(1753, 642);
-            this.BtnCheckFace.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnCheckFace.Margin = new System.Windows.Forms.Padding(4);
             this.BtnCheckFace.Name = "BtnCheckFace";
             this.BtnCheckFace.Size = new System.Drawing.Size(169, 55);
             this.BtnCheckFace.TabIndex = 12;
@@ -174,7 +177,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(1951, 380);
+            this.label2.Location = new System.Drawing.Point(1957, 385);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(64, 25);
@@ -184,7 +187,7 @@
             // txtScore
             // 
             this.txtScore.Location = new System.Drawing.Point(1951, 414);
-            this.txtScore.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtScore.Margin = new System.Windows.Forms.Padding(4);
             this.txtScore.Name = "txtScore";
             this.txtScore.Size = new System.Drawing.Size(162, 29);
             this.txtScore.TabIndex = 13;
@@ -192,7 +195,7 @@
             // BtnSaveFace
             // 
             this.BtnSaveFace.Location = new System.Drawing.Point(1753, 707);
-            this.BtnSaveFace.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnSaveFace.Margin = new System.Windows.Forms.Padding(4);
             this.BtnSaveFace.Name = "BtnSaveFace";
             this.BtnSaveFace.Size = new System.Drawing.Size(171, 55);
             this.BtnSaveFace.TabIndex = 15;
@@ -203,7 +206,7 @@
             // TxtErrorMessage
             // 
             this.TxtErrorMessage.Location = new System.Drawing.Point(20, 938);
-            this.TxtErrorMessage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TxtErrorMessage.Margin = new System.Windows.Forms.Padding(4);
             this.TxtErrorMessage.Name = "TxtErrorMessage";
             this.TxtErrorMessage.Size = new System.Drawing.Size(2092, 29);
             this.TxtErrorMessage.TabIndex = 16;
@@ -211,7 +214,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(15, 910);
+            this.label3.Location = new System.Drawing.Point(28, 909);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(164, 25);
@@ -221,7 +224,7 @@
             // txtDetail
             // 
             this.txtDetail.Location = new System.Drawing.Point(1753, 484);
-            this.txtDetail.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtDetail.Margin = new System.Windows.Forms.Padding(4);
             this.txtDetail.Multiline = true;
             this.txtDetail.Name = "txtDetail";
             this.txtDetail.Size = new System.Drawing.Size(360, 82);
@@ -230,7 +233,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(1753, 456);
+            this.label4.Location = new System.Drawing.Point(1763, 455);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(61, 25);
@@ -240,7 +243,7 @@
             // BtnListPeople
             // 
             this.BtnListPeople.Location = new System.Drawing.Point(1753, 833);
-            this.BtnListPeople.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnListPeople.Margin = new System.Windows.Forms.Padding(4);
             this.BtnListPeople.Name = "BtnListPeople";
             this.BtnListPeople.Size = new System.Drawing.Size(171, 55);
             this.BtnListPeople.TabIndex = 21;
@@ -251,7 +254,7 @@
             // LvFaceList
             // 
             this.LvFaceList.Location = new System.Drawing.Point(1276, 20);
-            this.LvFaceList.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.LvFaceList.Margin = new System.Windows.Forms.Padding(6);
             this.LvFaceList.MultiSelect = false;
             this.LvFaceList.Name = "LvFaceList";
             this.LvFaceList.Size = new System.Drawing.Size(464, 883);
@@ -262,7 +265,7 @@
             // BtnCancel
             // 
             this.BtnCancel.Location = new System.Drawing.Point(1753, 770);
-            this.BtnCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnCancel.Margin = new System.Windows.Forms.Padding(4);
             this.BtnCancel.Name = "BtnCancel";
             this.BtnCancel.Size = new System.Drawing.Size(171, 55);
             this.BtnCancel.TabIndex = 22;
@@ -272,10 +275,10 @@
             // 
             // BtnImportImage
             // 
-            this.BtnImportImage.Location = new System.Drawing.Point(1753, 894);
-            this.BtnImportImage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnImportImage.Location = new System.Drawing.Point(1951, 707);
+            this.BtnImportImage.Margin = new System.Windows.Forms.Padding(4);
             this.BtnImportImage.Name = "BtnImportImage";
-            this.BtnImportImage.Size = new System.Drawing.Size(171, 37);
+            this.BtnImportImage.Size = new System.Drawing.Size(163, 55);
             this.BtnImportImage.TabIndex = 23;
             this.BtnImportImage.Text = "Import image";
             this.BtnImportImage.UseVisualStyleBackColor = true;
@@ -285,7 +288,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2125, 993);
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(2126, 999);
             this.Controls.Add(this.BtnImportImage);
             this.Controls.Add(this.BtnCancel);
             this.Controls.Add(this.BtnListPeople);
@@ -308,8 +312,10 @@
             this.Controls.Add(this.BtnDeletePerson);
             this.Controls.Add(this.ImgCamUser);
             this.Controls.Add(this.BtnCaptureFace);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmMain";
+            this.Padding = new System.Windows.Forms.Padding(10);
             this.Text = "Client for Face Management";
             ((System.ComponentModel.ISupportInitialize)(this.ImgCamUser)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxCapturedImage)).EndInit();

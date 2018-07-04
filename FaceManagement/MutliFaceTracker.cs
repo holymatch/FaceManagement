@@ -13,7 +13,7 @@ namespace FaceManagement
     class MutliFaceTracker : IDisposable
     {
         private const int REINITBYSUCCESSFRAMECOUNT = 48;
-        private const int REINITBYFAILFRAMECOUNT = 6;
+        private const int REINITBYFAILFRAMECOUNT = 120;
 
         private LinkedList<FaceTracker> trackingFaces;
         private const float INTERSECTRATIO = 0.3f;
@@ -35,7 +35,7 @@ namespace FaceManagement
             var trackNode = trackingFaces.First;
             while (trackNode != null)
             {
-                if ((!trackNode.Value.trackFace(bgrImage) || trackNode.Value.FailToRecognize) && trackNode.Value.failFrameCount > REINITBYFAILFRAMECOUNT)
+                if (((!trackNode.Value.trackFace(bgrImage) || trackNode.Value.FailToRecognize) && trackNode.Value.failFrameCount > REINITBYFAILFRAMECOUNT) || trackNode.Value.missingFace)
                 {
                     trackNode.Value.Dispose();
                     trackingFaces.Remove(trackNode.Value);

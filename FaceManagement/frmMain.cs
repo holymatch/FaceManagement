@@ -111,10 +111,15 @@ namespace FaceManagement
                         if (tracker == null)
                         {
                             tracker = new MutliFaceTracker();
-                        }                        
-                        tracker.trackFace(imageFrame);
+                        }     
+                        lock (imageFrame)
+                        {
+                            tracker.trackFace(imageFrame);
+                            ImgCamUser.Image = imageFrame;
+                        }
+                        
                     //}
-                    ImgCamUser.Image = imageFrame;
+                    
                 }                    
             }
                 

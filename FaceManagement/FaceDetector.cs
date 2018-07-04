@@ -26,22 +26,35 @@ namespace FaceManagement
 
         public Rectangle[] findFace(Image<Gray, byte> grayImage)
         {
-            return _cascadeClassifier.DetectMultiScale(grayImage, 1.5, 3, new Size(80, 80));
+            lock (grayImage)
+            {
+                return _cascadeClassifier.DetectMultiScale(grayImage, 1.5, 3, new Size(80, 80));
+            }
+            
         }
 
         public Rectangle[] findFace(Image<Bgr, byte> BgrImage)
         {
-            return findFace(BgrImage.Convert<Gray, byte>());
+            lock(BgrImage)
+            {
+                return findFace(BgrImage.Convert<Gray, byte>());
+            }            
         }
 
         public Rectangle[] findEye(Image<Gray, byte> grayImage)
         {
-            return _cascadeEyeClassifier.DetectMultiScale(grayImage, 1.1, 3, Size.Empty);
+            lock(grayImage)
+            {
+                return _cascadeEyeClassifier.DetectMultiScale(grayImage, 1.1, 3, Size.Empty);
+            }            
         }
 
         public Rectangle[] findEye(Image<Bgr, byte> BgrImage)
         {
-            return findEye(BgrImage.Convert<Gray, byte>());
+            lock(BgrImage)
+            {
+                return findEye(BgrImage.Convert<Gray, byte>());
+            }
         }
 
         public Image<Bgr, byte> getFace()
@@ -132,12 +145,16 @@ namespace FaceManagement
 
         internal Image<Bgr, byte> drawFaceToImage(Image<Bgr, byte> bgrImage, HumanFace humanFace)
         {
-            bgrImage.Draw(humanFace.faceRectangle, new Bgr(Color.BurlyWood), 3);
-            for (var i = 0; i < humanFace.eyeRectangle.Count(); i++)
+            lock (bgrImage)
             {
-                bgrImage.Draw(new Rectangle(humanFace.faceRectangle.X + humanFace.eyeRectangle[i].X, humanFace.faceRectangle.Y + humanFace.eyeRectangle[i].Y, humanFace.eyeRectangle[i].Width, humanFace.eyeRectangle[i].Height), new Bgr(Color.Green), 1);
-            }
-            return bgrImage;
+                bgrImage.Draw(humanFace.faceRectangle, new Bgr(Color.BurlyWood), 3);
+                for (var i = 0; i < humanFace.eyeRectangle.Count(); i++)
+                {
+
+                    bgrImage.Draw(new Rectangle(humanFace.faceRectangle.X + humanFace.eyeRectangle[i].X, humanFace.faceRectangle.Y + humanFace.eyeRectangle[i].Y, humanFace.eyeRectangle[i].Width, humanFace.eyeRectangle[i].Height), new Bgr(Color.Green), 1);
+                }
+                return bgrImage;
+            }            
         }
     }
 }
