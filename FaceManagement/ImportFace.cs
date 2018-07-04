@@ -15,6 +15,7 @@ namespace FaceManagement
 {
     public partial class ImportFace : Form
     {
+        private static int RESIZE_IMAGE_HEIGHT = 75, RESIZE_IMAGE_WIIDTH = 75;
 
         List<String> files = new List<String>();
 
@@ -46,27 +47,41 @@ namespace FaceManagement
 
         private async void BtnImport_Click(object sender, EventArgs e)
         {
+            FaceDetector faceDetector= new FaceDetector();
+            int successCount = 0;
             foreach (String file in files)
             {
                 if (File.Exists(file))
                 {
                     var filename = Path.GetFileNameWithoutExtension(file);
-                    Byte[] bytes = File.ReadAllBytes(file);
-                    String image = Convert.ToBase64String(bytes);
-                    try
+                    Image imageFile = Image.FromFile(file);
+                    var human = faceDetector.findHumanFace(imageFile);
+                    if (human.Count() > 0)
                     {
-                        if (!(await ImportFaceToServerAsync(new Person(filename, "", new WebEntity.Face(image)))))
+                        Byte[] bytes = human[0].face.Resize(RESIZE_IMAGE_WIIDTH, RESIZE_IMAGE_HEIGHT, Emgu.CV.CvEnum.Inter.Cubic).ToJpegData();
+                        //Byte[] bytes = File.ReadAllBytes(file);
+                        String image = Convert.ToBase64String(bytes);
+                        try
                         {
+                            if (!(await ImportFaceToServerAsync(new Person(filename, "", new WebEntity.Face(image)))))
+                            {
+                                LstFailBox.Items.Add(file);
+                            } else
+                            {
+                                successCount++;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("Error import image: " + ex);
                             LstFailBox.Items.Add(file);
                         }
-                    } catch (Exception ex)
-                    {
-                        Debug.WriteLine("Error import image: " + ex);
-                        LstFailBox.Items.Add(file);
-                    }
+
+                    }  
                     
                 }
             }
+            MessageBox.Show("Import complete, total " + successCount + " file import success.","Import complete",MessageBoxButtons.OK);
         }
 
         private async Task<bool> ImportFaceToServerAsync(Person person)

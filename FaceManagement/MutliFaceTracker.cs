@@ -12,7 +12,7 @@ namespace FaceManagement
 {
     class MutliFaceTracker : IDisposable
     {
-        private const int REINITBYSUCCESSFRAMECOUNT = 48;
+        private const int REINITBYSUCCESSFRAMECOUNT = 24;
         private const int REINITBYFAILFRAMECOUNT = 120;
 
         private LinkedList<FaceTracker> trackingFaces;
