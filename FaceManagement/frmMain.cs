@@ -1,21 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Emgu.CV;
 using Emgu.CV.Structure;
-using Emgu.Util;
 using System.IO;
 using System.Diagnostics;
-using Emgu.CV.Tracking;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using Newtonsoft.Json;
 using RestfulClient;
 using System.Net;
 
@@ -34,6 +25,8 @@ namespace FaceManagement
         private Dictionary<String, Person> people = new Dictionary<string, Person>();
         private Person selectedPerson = null;
         private CaptureImageType captureImageType;
+
+        public String FaceInformationServerURL;
 
         enum CaptureImageType
         {
@@ -64,6 +57,7 @@ namespace FaceManagement
         {
             InitializeComponent();
             UpdateBtnStatus(CaptureImageType.None);
+            txtServerURL.Text = RestfulClient.client.BaseAddress.ToString();
         }
 
         private void BtnCaptureFace_Click(object sender, EventArgs e)
@@ -710,6 +704,11 @@ namespace FaceManagement
         {
             var importFace = new ImportFace();
             importFace.Show();
+        }
+
+        private void txtServerURL_TextChanged(object sender, EventArgs e)
+        {
+            RestfulClient.client.BaseAddress = new Uri(txtServerURL.Text);
         }
 
         public Image Base64ToImage(string base64String)

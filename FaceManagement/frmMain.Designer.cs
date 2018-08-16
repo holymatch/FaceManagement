@@ -52,6 +52,8 @@
             this.LvFaceList = new System.Windows.Forms.ListView();
             this.BtnCancel = new System.Windows.Forms.Button();
             this.BtnImportImage = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtServerURL = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.ImgCamUser)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxCapturedImage)).BeginInit();
             this.SuspendLayout();
@@ -208,7 +210,7 @@
             this.TxtErrorMessage.Location = new System.Drawing.Point(20, 938);
             this.TxtErrorMessage.Margin = new System.Windows.Forms.Padding(4);
             this.TxtErrorMessage.Name = "TxtErrorMessage";
-            this.TxtErrorMessage.Size = new System.Drawing.Size(2092, 29);
+            this.TxtErrorMessage.Size = new System.Drawing.Size(1247, 29);
             this.TxtErrorMessage.TabIndex = 16;
             // 
             // label3
@@ -284,12 +286,32 @@
             this.BtnImportImage.UseVisualStyleBackColor = true;
             this.BtnImportImage.Click += new System.EventHandler(this.BtnImportImage_Click);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(1274, 909);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(263, 25);
+            this.label5.TabIndex = 24;
+            this.label5.Text = "Face Information Server URL";
+            // 
+            // txtServerURL
+            // 
+            this.txtServerURL.Location = new System.Drawing.Point(1279, 938);
+            this.txtServerURL.Margin = new System.Windows.Forms.Padding(4);
+            this.txtServerURL.Name = "txtServerURL";
+            this.txtServerURL.Size = new System.Drawing.Size(835, 29);
+            this.txtServerURL.TabIndex = 25;
+            this.txtServerURL.TextChanged += new System.EventHandler(this.txtServerURL_TextChanged);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(2126, 999);
+            this.Controls.Add(this.txtServerURL);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.BtnImportImage);
             this.Controls.Add(this.BtnCancel);
             this.Controls.Add(this.BtnListPeople);
@@ -348,6 +370,8 @@
         private System.Windows.Forms.ListView LvFaceList;
         private System.Windows.Forms.Button BtnCancel;
         private System.Windows.Forms.Button BtnImportImage;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox txtServerURL;
     }
 }
 
