@@ -292,19 +292,27 @@ namespace FaceManagement
                     {
                         if (cropedFace != null)
                         {
-                            var person = new Person(txtUsrename.Text, txtDetail.Text, new WebEntity.Face(Convert.ToBase64String(cropedFace)));
+                            try
+                            {
+                                var person = new Person(txtUsrename.Text, txtDetail.Text, new WebEntity.Face(Convert.ToBase64String(cropedFace)));
 
-                            TxtErrorMessage.Text = "";
-                            var response = await RestfulClient.CreatePerson(person);
-                            if (response.ReturnCode == 200)
+                                TxtErrorMessage.Text = "";
+                                var response = await RestfulClient.CreatePerson(person);
+                                if (response.ReturnCode == 200)
+                                {
+                                    TxtErrorMessage.Text = "Success";
+                                }
+                                else
+                                {
+                                    TxtErrorMessage.Text = response.Message;
+                                    return;
+                                }
+                            } catch (Exception ex)
                             {
-                                TxtErrorMessage.Text = "Success";
-                            }
-                            else
-                            {
-                                TxtErrorMessage.Text = response.Message;
+                                TxtErrorMessage.Text = ex.Message;
                                 return;
                             }
+                            
                         }
                         else
                         {
@@ -706,9 +714,23 @@ namespace FaceManagement
             importFace.Show();
         }
 
-        private void txtServerURL_TextChanged(object sender, EventArgs e)
+        private void txtServerURL_Leave(object sender, EventArgs e)
         {
-            RestfulClient.client.BaseAddress = new Uri(txtServerURL.Text);
+            try
+            {
+                if (txtServerURL.Text == "")
+                {
+                    RestfulClient.client.BaseAddress = null;
+                } else
+                {
+                    RestfulClient.client.BaseAddress = new Uri(txtServerURL.Text);
+                }
+                
+            } catch (Exception ex)
+            {
+                MessageBox.Show("URL is incorrect please correct it.", "URL in correct", MessageBoxButtons.OK);
+                txtServerURL.Focus();
+            }            
         }
 
         public Image Base64ToImage(string base64String)
