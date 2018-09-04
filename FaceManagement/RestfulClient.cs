@@ -15,11 +15,7 @@ namespace FaceManagement
         public static HttpClient client = new HttpClient();
 
         static RestfulClient() {
-            //client.BaseAddress = new Uri("http://192.168.11.92:5002/");
-            //client.BaseAddress = new Uri("http://localhost:3000/");
-            //client.BaseAddress = new Uri("http://192.168.11.92:3000/");
-            //client.BaseAddress = new Uri("http://holymatch.asuscomm.com:8888/faceweb/");
-            client.BaseAddress = new Uri("http://localhost:8080/faceweb/");
+            client.BaseAddress = new Uri(Properties.Settings.Default["baseurl"].ToString());
         }
 
         static async Task<Person> CreateGenAsync(String image)

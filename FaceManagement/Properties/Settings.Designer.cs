@@ -22,5 +22,17 @@ namespace FaceManagement.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:8080/faceweb/")]
+        public string baseurl {
+            get {
+                return ((string)(this["baseurl"]));
+            }
+            set {
+                this["baseurl"] = value;
+            }
+        }
     }
 }

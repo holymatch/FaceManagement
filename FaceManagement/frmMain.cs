@@ -706,9 +706,19 @@ namespace FaceManagement
             importFace.Show();
         }
 
+        //TODO change to lost focuse
         private void txtServerURL_TextChanged(object sender, EventArgs e)
         {
-            RestfulClient.client.BaseAddress = new Uri(txtServerURL.Text);
+            try
+            {
+                RestfulClient.client.BaseAddress = new Uri(txtServerURL.Text);
+                Properties.Settings.Default["baseurl"] = txtServerURL.Text;
+                Properties.Settings.Default.Save();
+            } catch (Exception ex)
+            {
+                Debug.Write(ex);
+            }
+            
         }
 
         public Image Base64ToImage(string base64String)
