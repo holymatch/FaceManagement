@@ -340,7 +340,7 @@
             this.Name = "frmMain";
             this.Padding = new System.Windows.Forms.Padding(9);
             this.Text = "Client for Face Management";
-            this.Load += new System.EventHandler(this.frmMain_Load);
+            this.Load += new System.EventHandler(this.frmMain_LoadAsync);
             ((System.ComponentModel.ISupportInitialize)(this.ImgCamUser)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxCapturedImage)).EndInit();
             this.ResumeLayout(false);

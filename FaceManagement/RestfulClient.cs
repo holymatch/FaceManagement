@@ -16,7 +16,7 @@ namespace FaceManagement
         public static HttpClient client = new HttpClient();
         private static string baseurl = "";
 
-        public static bool setBaseAddress(string hosts)
+        public static async Task<bool> setBaseAddressAsync(string hosts)
         {
             if (hosts.ToLower().StartsWith("http://") || hosts.ToLower().StartsWith("https://"))
             {
@@ -32,22 +32,22 @@ namespace FaceManagement
             client.BaseAddress = new Uri(baseurl);
 
             // return URI of the created resource.
-            var result = HealthChech();
-            return result.Equals("UP");
+            var result = await HealthChech();
+            
+            return result.status.Equals("UP");
         }
 
-        static async Task<String> HealthChech()
+        static async Task<HealthcheckResponse> HealthChech()
         {
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            client.
-            var response = await client.GetStringAsync("health");
+            
+            HttpResponseMessage response = await client.GetAsync("health");
             Debug.Write("Health Check response is :" + response);
-            //Console.WriteLine(response.Content);
-            //Console.WriteLine("RequestMessageContect " + response.RequestMessage.Content);
-            return response;
-            //return await response.Content.ReadAsAsync<HealthcheckResponse>();
+            HealthcheckResponse healthCheck = await response.Content.ReadAsAsync<HealthcheckResponse>();
+            Debug.Write("Health Check Status: " + healthCheck.status);
+            return healthCheck;
 
         }
 

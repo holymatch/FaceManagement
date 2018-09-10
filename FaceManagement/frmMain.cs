@@ -57,7 +57,6 @@ namespace FaceManagement
         {
             InitializeComponent();
             UpdateBtnStatus(CaptureImageType.None);
-            txtServerURL.Text = Properties.Settings.Default["hosts"].ToString();
         }
 
         private void BtnCaptureFace_Click(object sender, EventArgs e)
@@ -719,6 +718,7 @@ namespace FaceManagement
             try
             {
                 Debug.Write(txtServerURL.Text);
+                label5.ForeColor = Color.Black;
                 if (txtServerURL.Text == "")
                 {
                     RestfulClient.client.BaseAddress = null;
@@ -727,15 +727,7 @@ namespace FaceManagement
                 {
                     try
                     {
-                        var result = RestfulClient.setBaseAddress(txtServerURL.Text);
-                        if (result)
-                        {
-                            label5.ForeColor = Color.Green;
-                        }
-                        else
-                        {
-                            label5.ForeColor = Color.Red;
-                        }
+                        updateStatusAsync();
                         Properties.Settings.Default["hosts"] = txtServerURL.Text;
                         Properties.Settings.Default.Save();
                     } catch (Exception ex)
@@ -753,11 +745,13 @@ namespace FaceManagement
             }            
         }
 
-        private void frmMain_Load(object sender, EventArgs e)
+        private async void frmMain_LoadAsync(object sender, EventArgs e)
         {
             try
             {
-                var result = RestfulClient.setBaseAddress(Properties.Settings.Default["hosts"].ToString());
+                txtServerURL.Text = Properties.Settings.Default["hosts"].ToString();
+                var result = await RestfulClient.setBaseAddressAsync(txtServerURL.Text);
+                updateStatusAsync();
             } catch (Exception ex)
             {
                 Debug.Write(ex);
@@ -765,9 +759,25 @@ namespace FaceManagement
             }
         }
 
-        private void updateStatus()
+        private async void updateStatusAsync()
         {
-
+            try
+            {
+                var result = await RestfulClient.setBaseAddressAsync(txtServerURL.Text);
+                if (result)
+                {
+                    label5.ForeColor = Color.Green;
+                }
+                else
+                {
+                    label5.ForeColor = Color.Red;
+                }
+            } catch (Exception ex)
+            {
+                Debug.Write(ex);
+                label5.ForeColor = Color.Red;
+            }
+            
         }
 
         public Image Base64ToImage(string base64String)
