@@ -57,7 +57,7 @@ namespace FaceManagement
         {
             InitializeComponent();
             UpdateBtnStatus(CaptureImageType.None);
-            txtServerURL.Text = RestfulClient.client.BaseAddress.ToString();
+            txtServerURL.Text = Properties.Settings.Default["hosts"].ToString();
         }
 
         private void BtnCaptureFace_Click(object sender, EventArgs e)
@@ -718,21 +718,56 @@ namespace FaceManagement
         {
             try
             {
+                Debug.Write(txtServerURL.Text);
                 if (txtServerURL.Text == "")
                 {
                     RestfulClient.client.BaseAddress = null;
-                } else
+                }
+                else
                 {
-                    RestfulClient.client.BaseAddress = new Uri(txtServerURL.Text);
-                    Properties.Settings.Default["baseurl"] = txtServerURL.Text;
-                    Properties.Settings.Default.Save();
+                    try
+                    {
+                        var result = RestfulClient.setBaseAddress(txtServerURL.Text);
+                        if (result)
+                        {
+                            label5.ForeColor = Color.Green;
+                        }
+                        else
+                        {
+                            label5.ForeColor = Color.Red;
+                        }
+                        Properties.Settings.Default["hosts"] = txtServerURL.Text;
+                        Properties.Settings.Default.Save();
+                    } catch (Exception ex)
+                    {
+                        Debug.Write(ex);
+                    }
+                    
                 }
                 
             } catch (Exception ex)
             {
                 MessageBox.Show("URL is incorrect please correct it.", "URL in correct", MessageBoxButtons.OK);
                 txtServerURL.Focus();
+                Debug.Write(ex);
             }            
+        }
+
+        private void frmMain_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                var result = RestfulClient.setBaseAddress(Properties.Settings.Default["hosts"].ToString());
+            } catch (Exception ex)
+            {
+                Debug.Write(ex);
+                label5.ForeColor = Color.Red;
+            }
+        }
+
+        private void updateStatus()
+        {
+
         }
 
         public Image Base64ToImage(string base64String)

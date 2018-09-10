@@ -25,13 +25,13 @@ namespace FaceManagement.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:8080/faceweb/")]
-        public string baseurl {
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost:8080")]
+        public string hosts {
             get {
-                return ((string)(this["baseurl"]));
+                return ((string)(this["hosts"]));
             }
             set {
-                this["baseurl"] = value;
+                this["hosts"] = value;
             }
         }
     }

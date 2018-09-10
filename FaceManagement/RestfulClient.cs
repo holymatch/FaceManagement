@@ -1,6 +1,7 @@
 ﻿using RestfulClient;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -13,15 +14,47 @@ namespace FaceManagement
     class RestfulClient
     {
         public static HttpClient client = new HttpClient();
+        private static string baseurl = "";
 
-        static RestfulClient() {
-            client.BaseAddress = new Uri(Properties.Settings.Default["baseurl"].ToString());
+        public static bool setBaseAddress(string hosts)
+        {
+            if (hosts.ToLower().StartsWith("http://") || hosts.ToLower().StartsWith("https://"))
+            {
+                baseurl = hosts;
+            }
+            else
+            {
+                baseurl = "http://" + hosts + "/";
+            }
+            client.CancelPendingRequests();
+            client.Dispose();
+            client = new HttpClient();
+            client.BaseAddress = new Uri(baseurl);
+
+            // return URI of the created resource.
+            var result = HealthChech();
+            return result.Equals("UP");
+        }
+
+        static async Task<String> HealthChech()
+        {
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            client.
+            var response = await client.GetStringAsync("health");
+            Debug.Write("Health Check response is :" + response);
+            //Console.WriteLine(response.Content);
+            //Console.WriteLine("RequestMessageContect " + response.RequestMessage.Content);
+            return response;
+            //return await response.Content.ReadAsAsync<HealthcheckResponse>();
+
         }
 
         static async Task<Person> CreateGenAsync(String image)
         {
             HttpResponseMessage response = await client.PostAsJsonAsync(
-                "recognize", image);
+                "faceweb/recognize", image);
             response.EnsureSuccessStatusCode();
             Person person = null;
             if (response.IsSuccessStatusCode)
@@ -36,20 +69,20 @@ namespace FaceManagement
         public static async Task<JsonResponseMessage<Person>> CreatePerson(Person person)
         {
             HttpResponseMessage response = await client.PostAsJsonAsync(
-                "people", person);
+                "faceweb/people", person);
             return await response.Content.ReadAsAsync<JsonResponseMessage<Person>>();
         }
 
         public static async Task<JsonResponseMessage<Person>> UpdatePerson(Person person)
         {
             HttpResponseMessage response = await client.PutAsJsonAsync(
-                "people/" + person.Id, person);
+                "faceweb/people/" + person.Id, person);
             return await response.Content.ReadAsAsync<JsonResponseMessage<Person>>();
         }
 
         public static async Task<HttpResponseMessage> RemovePerson(Person person)
         {
-            HttpResponseMessage response = await client.DeleteAsync("people/" + person.Id);
+            HttpResponseMessage response = await client.DeleteAsync("faceweb/people/" + person.Id);
             return response;
         }
 
@@ -59,7 +92,7 @@ namespace FaceManagement
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             HttpResponseMessage response = await client.PostAsJsonAsync(
-                "recognize", face);
+                "faceweb/recognize", face);
             Console.WriteLine(response.Content);
             Console.WriteLine("RequestMessageContect " + response.RequestMessage.Content);
             return await response.Content.ReadAsAsync<JsonResponseMessage<Person>>();
@@ -70,7 +103,7 @@ namespace FaceManagement
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            HttpResponseMessage response = await client.GetAsync("people");
+            HttpResponseMessage response = await client.GetAsync("faceweb/people");
             Console.WriteLine(response.Content);
             Console.WriteLine("RequestMessageContect " + response.RequestMessage.Content);
             return await response.Content.ReadAsAsync<JsonResponseMessage<List<Person>>>();
@@ -110,5 +143,10 @@ namespace FaceManagement
         public T Content { get; set; }
         public int ReturnCode { get; set; }
         public string Message { get; set; }
+    }
+
+    class HealthcheckResponse
+    {
+        public string status { get; set; }
     }
 }

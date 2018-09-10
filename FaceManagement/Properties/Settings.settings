@@ -2,8 +2,8 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="FaceManagement.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="baseurl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">http://localhost:8080/faceweb/</Value>
+    <Setting Name="hosts" Type="System.String" Scope="User">
+      <Value Profile="(Default)">localhost:8080</Value>
     </Setting>
   </Settings>
 </SettingsFile>
