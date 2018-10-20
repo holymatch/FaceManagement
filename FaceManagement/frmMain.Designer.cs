@@ -36,8 +36,6 @@
             this.txtUsrename = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
             this.BtnStartPreview = new System.Windows.Forms.Button();
             this.ImageBoxCapturedImage = new Emgu.CV.UI.ImageBox();
             this.BtnCheckFace = new System.Windows.Forms.Button();
@@ -54,8 +52,18 @@
             this.BtnImportImage = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.txtServerURL = new System.Windows.Forms.TextBox();
+            this.BtnSetHoloLensIP = new System.Windows.Forms.Button();
+            this.txtHoloLensIP = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.BtnDisconnect = new System.Windows.Forms.Button();
+            this.txtIpOnHoloLens = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.tcpConnectionChecker = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.ImgCamUser)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxCapturedImage)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // BtnCaptureFace
@@ -119,30 +127,6 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Visible = false;
             this.button3.Click += new System.EventHandler(this.button3_Click);
-            // 
-            // button4
-            // 
-            this.button4.Location = new System.Drawing.Point(1951, 833);
-            this.button4.Margin = new System.Windows.Forms.Padding(4);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(163, 55);
-            this.button4.TabIndex = 7;
-            this.button4.Text = "button4";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Visible = false;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
-            // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(1951, 770);
-            this.button5.Margin = new System.Windows.Forms.Padding(4);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(163, 54);
-            this.button5.TabIndex = 8;
-            this.button5.Text = "Overlap Test";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Visible = false;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // BtnStartPreview
             // 
@@ -301,16 +285,112 @@
             this.txtServerURL.Location = new System.Drawing.Point(1280, 938);
             this.txtServerURL.Margin = new System.Windows.Forms.Padding(4);
             this.txtServerURL.Name = "txtServerURL";
-            this.txtServerURL.Size = new System.Drawing.Size(835, 29);
+            this.txtServerURL.Size = new System.Drawing.Size(840, 29);
             this.txtServerURL.TabIndex = 25;
             this.txtServerURL.Leave += new System.EventHandler(this.txtServerURL_Leave);
+            // 
+            // BtnSetHoloLensIP
+            // 
+            this.BtnSetHoloLensIP.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnSetHoloLensIP.Location = new System.Drawing.Point(508, 23);
+            this.BtnSetHoloLensIP.Margin = new System.Windows.Forms.Padding(4);
+            this.BtnSetHoloLensIP.Name = "BtnSetHoloLensIP";
+            this.BtnSetHoloLensIP.Size = new System.Drawing.Size(163, 55);
+            this.BtnSetHoloLensIP.TabIndex = 26;
+            this.BtnSetHoloLensIP.Text = "Connect";
+            this.BtnSetHoloLensIP.UseVisualStyleBackColor = true;
+            this.BtnSetHoloLensIP.Click += new System.EventHandler(this.BtnSetHoloLensIP_Click);
+            // 
+            // txtHoloLensIP
+            // 
+            this.txtHoloLensIP.Location = new System.Drawing.Point(133, 38);
+            this.txtHoloLensIP.Margin = new System.Windows.Forms.Padding(4);
+            this.txtHoloLensIP.Name = "txtHoloLensIP";
+            this.txtHoloLensIP.Size = new System.Drawing.Size(367, 29);
+            this.txtHoloLensIP.TabIndex = 27;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(7, 38);
+            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(118, 25);
+            this.label6.TabIndex = 28;
+            this.label6.Text = "HoloLens IP";
+            // 
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.Location = new System.Drawing.Point(1421, 26);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(163, 55);
+            this.button1.TabIndex = 29;
+            this.button1.Text = "Update IP";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.BtnDisconnect);
+            this.groupBox1.Controls.Add(this.txtIpOnHoloLens);
+            this.groupBox1.Controls.Add(this.label7);
+            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this.button1);
+            this.groupBox1.Controls.Add(this.txtHoloLensIP);
+            this.groupBox1.Controls.Add(this.BtnSetHoloLensIP);
+            this.groupBox1.Location = new System.Drawing.Point(12, 974);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(2108, 107);
+            this.groupBox1.TabIndex = 30;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "HoloLens Status";
+            // 
+            // BtnDisconnect
+            // 
+            this.BtnDisconnect.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnDisconnect.Location = new System.Drawing.Point(1592, 26);
+            this.BtnDisconnect.Margin = new System.Windows.Forms.Padding(4);
+            this.BtnDisconnect.Name = "BtnDisconnect";
+            this.BtnDisconnect.Size = new System.Drawing.Size(163, 55);
+            this.BtnDisconnect.TabIndex = 32;
+            this.BtnDisconnect.Text = "Disconnect";
+            this.BtnDisconnect.UseVisualStyleBackColor = true;
+            this.BtnDisconnect.Click += new System.EventHandler(this.BtnDisconnect_Click);
+            // 
+            // txtIpOnHoloLens
+            // 
+            this.txtIpOnHoloLens.Enabled = false;
+            this.txtIpOnHoloLens.Location = new System.Drawing.Point(1046, 38);
+            this.txtIpOnHoloLens.Margin = new System.Windows.Forms.Padding(4);
+            this.txtIpOnHoloLens.Name = "txtIpOnHoloLens";
+            this.txtIpOnHoloLens.Size = new System.Drawing.Size(367, 29);
+            this.txtIpOnHoloLens.TabIndex = 31;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(679, 38);
+            this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(359, 25);
+            this.label7.TabIndex = 30;
+            this.label7.Text = "FaceInformation Server IP on HoloLens:";
+            // 
+            // tcpConnectionChecker
+            // 
+            this.tcpConnectionChecker.Enabled = true;
+            this.tcpConnectionChecker.Interval = 1000;
+            this.tcpConnectionChecker.Tick += new System.EventHandler(this.tcpConnectionChecker_Tick);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1923, 999);
+            this.ClientSize = new System.Drawing.Size(2133, 1093);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.txtServerURL);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.BtnImportImage);
@@ -327,8 +407,6 @@
             this.Controls.Add(this.BtnCheckFace);
             this.Controls.Add(this.ImageBoxCapturedImage);
             this.Controls.Add(this.BtnStartPreview);
-            this.Controls.Add(this.button5);
-            this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtUsrename);
@@ -343,6 +421,8 @@
             this.Load += new System.EventHandler(this.frmMain_LoadAsync);
             ((System.ComponentModel.ISupportInitialize)(this.ImgCamUser)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBoxCapturedImage)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -356,8 +436,6 @@
         private System.Windows.Forms.TextBox txtUsrename;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button BtnStartPreview;
         private Emgu.CV.UI.ImageBox ImageBoxCapturedImage;
         private System.Windows.Forms.Button BtnCheckFace;
@@ -374,6 +452,15 @@
         private System.Windows.Forms.Button BtnImportImage;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtServerURL;
+        private System.Windows.Forms.Button BtnSetHoloLensIP;
+        private System.Windows.Forms.TextBox txtHoloLensIP;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.TextBox txtIpOnHoloLens;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button BtnDisconnect;
+        private System.Windows.Forms.Timer tcpConnectionChecker;
     }
 }
 

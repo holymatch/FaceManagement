@@ -14,6 +14,7 @@ namespace FaceManagement
 {
     public partial class frmMain : Form
     {
+        private TcpNetworkClientManager tcpNetworkClientManager;
 
         private VideoCapture _capture = null; //Camera
 
@@ -170,53 +171,6 @@ namespace FaceManagement
 
             _capture.Dispose();
 
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            
-            var directories = new List<String>(Directory.GetDirectories(_trainerPath).ToList());
-            for (var i = 0; i < directories.Count(); i++)
-            {
-                DirectoryInfo d = new DirectoryInfo(directories[i]);
-                FileInfo[] Files = d.GetFiles("*.jpg");
-                for (var j = 0; j < Files.ToList().Count(); j++)
-                {
-                    //Debug.Print("File name : {0}", Files[i].FullName);
-                    //Debug.Print("Dir name : {0}", d.Name);
-
-                    Bitmap image = (Bitmap)Image.FromFile(Files[j].FullName, true);
-                    FaceDetector faceDetector = new FaceDetector();
-                    var humanFaces = faceDetector.findHumanFace(image);
-                    if ( humanFaces.Count() == 0 )  {
-                        Debug.Print("Human Faces not found : {0}", Files[j].Name);
-                    } else if (humanFaces.Count() == 1)
-                    {
-
-                        Image<Gray, Byte> faceImage = new Image<Gray, Byte>(humanFaces[0].face.ToBitmap()); 
-                        
-                    }
-                    /*
-                    Byte[] file;
-
-                    using (var stream = new FileStream(Files[i].FullName, FileMode.Open, FileAccess.Read))
-                    {
-                        
-                        using (var reader = new BinaryReader(stream))
-                        {
-                            file = reader.ReadBytes((int)stream.Length);
-                        }
-                    }
-                    */
-                    //_dataStoreAccess.SaveFace(d.Name, file);
-                }
-            }
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            var myForm = new frmOverlapTest();
-            myForm.Show();
         }
 
         private void BtnStart_Click(object sender, EventArgs e)
@@ -745,11 +699,26 @@ namespace FaceManagement
             }            
         }
 
+        // Load Properties and test connection
         private async void frmMain_LoadAsync(object sender, EventArgs e)
         {
+
+            // Testing HoloLens IP
             try
             {
-                txtServerURL.Text = Properties.Settings.Default["hosts"].ToString();
+                txtHoloLensIP.Text = Properties.Settings.Default.HoloLensIP;
+                // TODO test and get HoloLens FaceInformation Server IP config
+            }
+            catch (Exception ex)
+            {
+                Debug.Write(ex);
+                label6.ForeColor = Color.Red;
+            }
+
+            // Testing FaceInformationServer IP
+            try
+            {
+                txtServerURL.Text = Properties.Settings.Default.hosts;
                 var result = await RestfulClient.setBaseAddressAsync(txtServerURL.Text);
                 updateStatusAsync();
             } catch (Exception ex)
@@ -778,6 +747,44 @@ namespace FaceManagement
                 label5.ForeColor = Color.Red;
             }
             
+        }
+
+        private void BtnSetHoloLensIP_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.HoloLensIP = txtHoloLensIP.Text;
+            Properties.Settings.Default.Save();
+            tcpNetworkClientManager = new TcpNetworkClientManager(Properties.Settings.Default.HoloLensIP, Properties.Settings.Default.HoloLensPort);
+            
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            String IP = Properties.Settings.Default.hosts.Substring(0, Math.Max(Properties.Settings.Default.hosts.IndexOf(':'), 0));
+            tcpNetworkClientManager.SendMessage(IP);
+        }
+
+        private void BtnDisconnect_Click(object sender, EventArgs e)
+        {
+            tcpNetworkClientManager.SendMessage("exit");
+        }
+
+        private void tcpConnectionChecker_Tick(object sender, EventArgs e)
+        {
+            if (tcpNetworkClientManager != null && tcpNetworkClientManager.IsConnected())
+            {
+                label6.ForeColor = Color.Green;
+                if (tcpNetworkClientManager.FaceInformationServerInHoloLensIP != null )
+                {
+                    txtIpOnHoloLens.Text = tcpNetworkClientManager.FaceInformationServerInHoloLensIP;
+                } else
+                {
+                    txtIpOnHoloLens.Text = "";
+                }
+            } else
+            {
+                label6.ForeColor = Color.Red;
+                txtIpOnHoloLens.Text = "";
+            }
         }
 
         public Image Base64ToImage(string base64String)

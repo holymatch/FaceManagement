@@ -5,5 +5,11 @@
     <Setting Name="hosts" Type="System.String" Scope="User">
       <Value Profile="(Default)">localhost:8080</Value>
     </Setting>
+    <Setting Name="HoloLensIP" Type="System.String" Scope="User">
+      <Value Profile="(Default)">172.18.0.10</Value>
+    </Setting>
+    <Setting Name="HoloLensPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">8885</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
